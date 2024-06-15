@@ -2,9 +2,12 @@ package org.example.eiscuno.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.control.Label;
 import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.deck.Deck;
 import org.example.eiscuno.model.game.GameUno;
@@ -12,6 +15,9 @@ import org.example.eiscuno.model.machine.ThreadPlayMachine;
 import org.example.eiscuno.model.machine.ThreadSingUNOMachine;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
+import org.example.eiscuno.model.unoenum.EISCUnoEnum;
+import javafx.scene.control.Button;
+
 
 /**
  * Controller class for the Uno game.
@@ -26,6 +32,16 @@ public class GameUnoController {
 
     @FXML
     private ImageView tableImageView;
+
+    @FXML
+    private Label logoEiscUno;
+
+    @FXML
+    private Button unoButton;
+
+    @FXML
+    private Button takeCardButton;
+
 
     private Player humanPlayer;
     private Player machinePlayer;
@@ -44,7 +60,10 @@ public class GameUnoController {
     @FXML
     public void initialize() {
         initVariables();
+        setImages();
+
         this.gameUno.startGame();
+
         printCardsHumanPlayer();
 
         threadSingUNOMachine = new ThreadSingUNOMachine(this.humanPlayer.getCardsPlayer());
@@ -67,6 +86,28 @@ public class GameUnoController {
         this.posInitCardToShow = 0;
     }
 
+    //anotacion: si no hago esto se invierte el mvc, porque deberia llamar el label y los paneles en el stage para
+    //cambiarlos allá
+    public void setImages() {
+        Image imageUno = new Image(getClass().getResourceAsStream(EISCUnoEnum.UNO.getFilePath()));
+        ImageView imageViewUno = new ImageView(imageUno);
+        imageViewUno.setFitWidth(logoEiscUno.getWidth());
+        imageViewUno.setFitHeight(logoEiscUno.getHeight());
+        logoEiscUno.setGraphic(imageViewUno);
+
+        Image imageDeckOfCards = new Image(getClass().getResourceAsStream(EISCUnoEnum.DECK_OF_CARDS.getFilePath()));
+        ImageView imageViewDeckOfCards = new ImageView(imageDeckOfCards);
+        imageViewDeckOfCards.setFitWidth(takeCardButton.getWidth());
+        imageViewDeckOfCards.setFitHeight(takeCardButton.getHeight());
+        takeCardButton.setGraphic(imageViewDeckOfCards);
+
+        Image imageUnoButton = new Image(getClass().getResourceAsStream(EISCUnoEnum.BUTTON_UNO.getFilePath()));
+        ImageView imageViewUnoButton = new ImageView(imageUnoButton);
+        imageViewUnoButton.setFitWidth(unoButton.getWidth());
+        imageViewUnoButton.setFitHeight(unoButton.getHeight());
+        unoButton.setGraphic(imageViewUnoButton);
+
+    }
     /**
      * Prints the human player's cards on the grid pane.
      */
@@ -117,6 +158,11 @@ public class GameUnoController {
             this.posInitCardToShow--;
             printCardsHumanPlayer();
         }
+    }
+
+    @FXML
+    void onHandleButtonExit(ActionEvent event) {
+        System.exit(0);
     }
 
     /**
