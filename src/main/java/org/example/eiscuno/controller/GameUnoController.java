@@ -36,6 +36,7 @@ public class GameUnoController {
 
     private ThreadSingUNOMachine threadSingUNOMachine;
     private ThreadPlayMachine threadPlayMachine;
+    private boolean eat=true;
 
     /**
      * Initializes the controller.
@@ -138,7 +139,11 @@ public class GameUnoController {
      */
     @FXML
     void onHandleTakeCard(ActionEvent event) {
-        // Implement logic to take a card here
+        Card newCard = this.deck.takeCard();
+        this.humanPlayer.addCard(newCard);
+
+        // Actualizar la vista de las cartas del jugador humano
+        printCardsHumanPlayer();
     }
 
     /**
@@ -148,6 +153,14 @@ public class GameUnoController {
      */
     @FXML
     void onHandleUno(ActionEvent event) {
-        // Implement logic to handle Uno event here
+      int uno =this.humanPlayer.getCardsPlayer().size();
+      if (uno==1){
+        this.threadSingUNOMachine.setEat(false);
+      }
+      else {
+          Card newCard = this.deck.takeCard();
+          this.humanPlayer.addCard(newCard);
+          printCardsHumanPlayer();
+      }
     }
 }

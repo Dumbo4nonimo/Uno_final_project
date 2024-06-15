@@ -81,6 +81,9 @@ public class Deck {
             return null;
         }
     }
+    public void takeACard(){
+
+    }
 
     /**
      * Takes a card from the top of the deck.
