@@ -30,6 +30,7 @@
       <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
             <ImageView fx:id="tableImageView" fitHeight="149.0" fitWidth="100.0" layoutX="79.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true" />
+            <Label fx:id="sayOne" layoutX="39.0" layoutY="-21.0" prefHeight="30.0" prefWidth="145.0" style="-fx-alignment: center; -fx-background-color: skyblue; -fx-border-radius: 39;" text="Te han cantado UNO" visible="false" />
          </children>
       </Pane>
    </center>

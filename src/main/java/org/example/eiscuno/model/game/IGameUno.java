@@ -43,6 +43,8 @@ public interface IGameUno {
      */
     Card[] getCurrentVisibleCardsHumanPlayer(int posInitCardToShow);
 
+    Card[] getCurrentVisibleCardsMachinePlayer(int posInitCardToShow);
+
     /**
      * Checks if the game is over.
      *

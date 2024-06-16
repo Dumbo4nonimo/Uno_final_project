@@ -101,6 +101,18 @@ public class GameUno implements IGameUno {
 
         return cards;
     }
+    @Override
+    public Card[] getCurrentVisibleCardsMachinePlayer(int posInitCardToShow) {
+        int totalCards = this.machinePlayer.getCardsPlayer().size();
+        int numVisibleCards = Math.min(4, totalCards - posInitCardToShow);
+        Card[] cards = new Card[numVisibleCards];
+
+        for (int i = 0; i < numVisibleCards; i++) {
+            cards[i] = this.machinePlayer.getCard(posInitCardToShow + i);
+        }
+
+        return cards;
+    }
 
     /**
      * Checks if the game is over.

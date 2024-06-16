@@ -1,5 +1,8 @@
 package org.example.eiscuno.controller;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -8,6 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.Label;
+import javafx.util.Duration;
 import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.deck.Deck;
 import org.example.eiscuno.model.game.GameUno;
@@ -18,10 +22,8 @@ import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.model.unoenum.EISCUnoEnum;
 import javafx.scene.control.Button;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Controller class for the Uno game.
- */
 public class GameUnoController {
 
     @FXML
@@ -35,13 +37,14 @@ public class GameUnoController {
 
     @FXML
     private Label logoEiscUno;
+    @FXML
+    private Label sayOne;
 
     @FXML
     private Button unoButton;
 
     @FXML
     private Button takeCardButton;
-
 
     private Player humanPlayer;
     private Player machinePlayer;
@@ -52,7 +55,9 @@ public class GameUnoController {
 
     private ThreadSingUNOMachine threadSingUNOMachine;
     private ThreadPlayMachine threadPlayMachine;
-    private boolean eat=true;
+    private boolean eat = true;
+
+    private final AtomicBoolean unoButtonPressed = new AtomicBoolean(false);
 
     /**
      * Initializes the controller.
@@ -65,8 +70,9 @@ public class GameUnoController {
         this.gameUno.startGame();
 
         printCardsHumanPlayer();
+        printCardsMachinePlayer();
 
-        threadSingUNOMachine = new ThreadSingUNOMachine(this.humanPlayer.getCardsPlayer());
+        threadSingUNOMachine = new ThreadSingUNOMachine(this.humanPlayer.getCardsPlayer(), this);
         Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNO");
         t.start();
 
@@ -86,8 +92,6 @@ public class GameUnoController {
         this.posInitCardToShow = 0;
     }
 
-    //anotacion: si no hago esto se invierte el mvc, porque deberia llamar el label y los paneles en el stage para
-    //cambiarlos allá
     public void setImages() {
         Image imageUno = new Image(getClass().getResourceAsStream(EISCUnoEnum.UNO.getFilePath()));
         ImageView imageViewUno = new ImageView(imageUno);
@@ -106,8 +110,8 @@ public class GameUnoController {
         imageViewUnoButton.setFitWidth(unoButton.getWidth());
         imageViewUnoButton.setFitHeight(unoButton.getHeight());
         unoButton.setGraphic(imageViewUnoButton);
-
     }
+
     /**
      * Prints the human player's cards on the grid pane.
      */
@@ -118,9 +122,8 @@ public class GameUnoController {
         for (int i = 0; i < currentVisibleCardsHumanPlayer.length; i++) {
             Card card = currentVisibleCardsHumanPlayer[i];
             ImageView cardImageView = card.getCard();
-
             cardImageView.setOnMouseClicked((MouseEvent event) -> {
-                // Aqui deberian verificar si pueden en la tabla jugar esa carta
+                // Verify if the card can be played on the table
                 gameUno.playCard(card);
                 tableImageView.setImage(card.getImage());
                 humanPlayer.removeCard(findPosCardsHumanPlayer(card));
@@ -129,6 +132,21 @@ public class GameUnoController {
             });
 
             this.gridPaneCardsPlayer.add(cardImageView, i, 0);
+        }
+    }
+    private void printCardsMachinePlayer() {
+        this.gridPaneCardsMachine.getChildren().clear();
+        Card[] currentVisibleCardsMachinePlayer = this.gameUno.getCurrentVisibleCardsMachinePlayer(this.posInitCardToShow);
+
+        for (int i = 0; i < currentVisibleCardsMachinePlayer.length; i++) {
+            Image cardMachine= new Image(getClass().getResourceAsStream(EISCUnoEnum.CARD_UNO.getFilePath()));
+            ImageView cardImageView = new ImageView(cardMachine);
+
+            cardImageView.setY(16);
+            cardImageView.setFitHeight(90);
+            cardImageView.setFitWidth(70);
+
+            this.gridPaneCardsMachine.add(cardImageView, i, 0);
         }
     }
 
@@ -188,8 +206,9 @@ public class GameUnoController {
         Card newCard = this.deck.takeCard();
         this.humanPlayer.addCard(newCard);
 
-        // Actualizar la vista de las cartas del jugador humano
+        // Update the view of the human player's cards
         printCardsHumanPlayer();
+        this.threadSingUNOMachine.setEat(true);
     }
 
     /**
@@ -199,14 +218,41 @@ public class GameUnoController {
      */
     @FXML
     void onHandleUno(ActionEvent event) {
-      int uno =this.humanPlayer.getCardsPlayer().size();
-      if (uno==1){
-        this.threadSingUNOMachine.setEat(false);
-      }
-      else {
-          Card newCard = this.deck.takeCard();
-          this.humanPlayer.addCard(newCard);
-          printCardsHumanPlayer();
-      }
+        int uno = this.humanPlayer.getCardsPlayer().size();
+        if (uno == 1) {
+            this.threadSingUNOMachine.setEat(false);
+            unoButtonPressed.set(true);// Mark that the Uno button was pressed
+        }
+        else {
+            Card newCard = this.deck.takeCard();
+            this.humanPlayer.addCard(newCard);
+            printCardsHumanPlayer();
+        }
+    }
+
+    public void showSayOneLabel() {
+        Platform.runLater(() -> {
+            sayOne.setVisible(true);
+            unoButtonPressed.set(false);  // Reset the Uno button state
+
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), evt -> {
+                if (!unoButtonPressed.get()) {
+                    System.out.println("The player did not press Uno in 3 seconds");
+                }
+                sayOne.setVisible(false);
+                this.threadSingUNOMachine.setEat(true);
+            }));
+            timeline.setCycleCount(1);
+            timeline.play();
+        });
+    }
+
+    public void singUnoMachine() {
+        Platform.runLater(() -> {
+            Card newCard = this.deck.takeCard();
+            this.humanPlayer.addCard(newCard);
+            printCardsHumanPlayer();
+            this.threadSingUNOMachine.setEat(true);
+        });
     }
 }
