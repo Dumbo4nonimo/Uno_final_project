@@ -16,14 +16,16 @@ import org.example.eiscuno.model.deck.Deck;
 import org.example.eiscuno.model.game.GameUno;
 import org.example.eiscuno.model.machine.ThreadPlayMachine;
 import org.example.eiscuno.model.machine.ThreadSingUNOMachine;
+import org.example.eiscuno.model.observer.Observer;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.model.unoenum.EISCUnoEnum;
 import javafx.scene.control.Button;
 
+import javax.swing.plaf.PanelUI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class GameUnoController {
+public class GameUnoController implements Observer {
 
     @FXML
     private GridPane gridPaneCardsMachine;
@@ -60,6 +62,7 @@ public class GameUnoController {
     private boolean eat = true;
 
     private final AtomicBoolean unoButtonPressed = new AtomicBoolean(false);
+    private int posInitCardToShow1;
 
     /**
      * Initializes the controller.
@@ -68,7 +71,7 @@ public class GameUnoController {
     public void initialize() {
         initVariables();
         setImages();
-
+        this.gameUno.addObserver(this);
         this.gameUno.startGame();
 
         printCardsHumanPlayer();
@@ -78,7 +81,7 @@ public class GameUnoController {
         Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNO");
         t.start();
 
-        threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.tableImageView);
+        threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.tableImageView, this);
         threadPlayMachine.start();
     }
 
@@ -92,6 +95,7 @@ public class GameUnoController {
         this.table = new Table();
         this.gameUno = new GameUno(this.humanPlayer, this.machinePlayer, this.deck, this.table);
         this.posInitCardToShow = 0;
+        this.posInitCardToShow1=0;
     }
 
     public void setImages() {
@@ -133,7 +137,7 @@ public class GameUnoController {
                     printCardsHumanByCases(card);
 
                 } else if (card.getPath().contains("2_wild_draw")) {
-                    if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())){
+                    if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
                         //Two cards are added to the machine´s array of cards
                         printCardsHumanByCases(card);
                         plusTwoPlusFourLabel.setText("Machine: +2");
@@ -171,12 +175,11 @@ public class GameUnoController {
 
             });
 
-
             this.gridPaneCardsPlayer.add(cardImageView, i, 0);
         }
     }
 
-    public void printCardsHumanByCases(Card card){
+    public void printCardsHumanByCases(Card card) {
         gameUno.playCard(card);
         tableImageView.setImage(card.getImage());
         humanPlayer.removeCard(findPosCardsHumanPlayer(card));
@@ -185,19 +188,22 @@ public class GameUnoController {
     }
 
     private void printCardsMachinePlayer() {
-        this.gridPaneCardsMachine.getChildren().clear();
-        Card[] currentVisibleCardsMachinePlayer = this.gameUno.getCurrentVisibleCardsMachinePlayer(this.posInitCardToShow);
+        Platform.runLater(() -> {
+            this.gridPaneCardsMachine.getChildren().clear();
+            Card[] currentVisibleCardsMachinePlayer = this.gameUno.getCurrentVisibleCardsMachinePlayer(this.posInitCardToShow1);
 
-        for (int i = 0; i < currentVisibleCardsMachinePlayer.length; i++) {
-            Image cardMachine= new Image(getClass().getResourceAsStream(EISCUnoEnum.CARD_UNO.getFilePath()));
-            ImageView cardImageView = new ImageView(cardMachine);
+            for (int i = 0; i < currentVisibleCardsMachinePlayer.length; i++) {
+                Card card = currentVisibleCardsMachinePlayer[i];
+                Image cardMachine = new Image(getClass().getResourceAsStream(EISCUnoEnum.CARD_UNO.getFilePath()));
+                ImageView cardImageView = new ImageView(cardMachine);
 
-            cardImageView.setY(16);
-            cardImageView.setFitHeight(90);
-            cardImageView.setFitWidth(70);
+                cardImageView.setY(16);
+                cardImageView.setFitHeight(90);
+                cardImageView.setFitWidth(70);
 
-            this.gridPaneCardsMachine.add(cardImageView, i, 0);
-        }
+                this.gridPaneCardsMachine.add(cardImageView, i, 0);
+            }
+        });
     }
 
     /**
@@ -224,7 +230,7 @@ public class GameUnoController {
     void onHandleBack(ActionEvent event) {
         if (this.posInitCardToShow > 0) {
             this.posInitCardToShow--;
-            printCardsHumanPlayer();
+            this.gameUno.notifyObservers();
         }
     }
 
@@ -242,7 +248,7 @@ public class GameUnoController {
     void onHandleNext(ActionEvent event) {
         if (this.posInitCardToShow < this.humanPlayer.getCardsPlayer().size() - 4) {
             this.posInitCardToShow++;
-            printCardsHumanPlayer();
+            this.gameUno.notifyObservers();
         }
     }
 
@@ -253,12 +259,9 @@ public class GameUnoController {
      */
     @FXML
     void onHandleTakeCard(ActionEvent event) {
-        Card newCard = this.deck.takeCard();
-        this.humanPlayer.addCard(newCard);
-
-        // Update the view of the human player's cards
-        printCardsHumanPlayer();
+        gameUno.eatCard(humanPlayer, 1);
         this.threadSingUNOMachine.setEat(true);
+        this.gameUno.notifyObservers();
     }
 
     /**
@@ -269,15 +272,16 @@ public class GameUnoController {
     @FXML
     void onHandleUno(ActionEvent event) {
         int uno = this.humanPlayer.getCardsPlayer().size();
+        int unoMachine = this.machinePlayer.getCardsPlayer().size();
         if (uno == 1) {
             this.threadSingUNOMachine.setEat(false);
-            unoButtonPressed.set(true);// Mark that the Uno button was pressed
+            unoButtonPressed.set(true);
+
+
+        } else if(unoMachine==1) {
+            gameUno.eatCard(machinePlayer, 1);
         }
-        else {
-            Card newCard = this.deck.takeCard();
-            this.humanPlayer.addCard(newCard);
-            printCardsHumanPlayer();
-        }
+        this.gameUno.notifyObservers();
     }
 
     public void showSayOneLabel() {
@@ -299,10 +303,23 @@ public class GameUnoController {
 
     public void singUnoMachine() {
         Platform.runLater(() -> {
-            Card newCard = this.deck.takeCard();
-            this.humanPlayer.addCard(newCard);
-            printCardsHumanPlayer();
+            gameUno.eatCard(humanPlayer, 1);
             this.threadSingUNOMachine.setEat(true);
         });
     }
+
+    @Override
+    public void update() {
+        Platform.runLater(() -> {
+            printCardsHumanPlayer();
+            printCardsMachinePlayer();
+        });
+    }
+
+    public void incrementPosInitCardToShow1() {
+        Platform.runLater(() -> {
+            this.posInitCardToShow1++;
+            printCardsMachinePlayer();
+        });
+}
 }
