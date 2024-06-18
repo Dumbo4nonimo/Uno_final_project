@@ -9,9 +9,9 @@ import org.example.eiscuno.controller.GameUnoController;
 
 import java.util.ArrayList;
 public class ThreadPlayMachine extends Thread {
-    private Table table;
-    private Player machinePlayer;
-    private ImageView tableImageView;
+    private static Table table;
+    private static Player machinePlayer;
+    private static ImageView tableImageView;
     private volatile boolean hasPlayerPlayed;
     private GameUnoController gameUnoController;
 
@@ -24,10 +24,10 @@ public class ThreadPlayMachine extends Thread {
     }
 
     public void run() {
-        int index;
-        while (true) {
-            if (hasPlayerPlayed) {
-                try {
+        int index = (int) (Math.random() * machinePlayer.getCardsPlayer().size());
+        while (true){
+            if(hasPlayerPlayed){
+                try{
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -47,6 +47,18 @@ public class ThreadPlayMachine extends Thread {
             table.addCardOnTheTable(card);
             tableImageView.setImage(card.getImage());
         });
+    }
+
+    public static void putCardOnTableByPath(Card arg){
+        int counter = 0;
+        for(Card card : machinePlayer.getCardsPlayer()){
+            if(card.getPath().equals(arg.getPath())){
+                Card obj = machinePlayer.getCard(counter);
+                table.addCardOnTheTable(obj);
+                tableImageView.setImage(obj.getImage());
+            }
+            counter ++;
+        }
     }
 
     public void setHasPlayerPlayed(boolean hasPlayerPlayed) {

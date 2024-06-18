@@ -22,10 +22,9 @@ import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.model.unoenum.EISCUnoEnum;
 import javafx.scene.control.Button;
 
-import javax.swing.plaf.PanelUI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class GameUnoController implements Observer {
+public class GameUnoController {
 
     @FXML
     private GridPane gridPaneCardsMachine;
@@ -48,7 +47,10 @@ public class GameUnoController implements Observer {
     private Button takeCardButton;
 
     @FXML
-    private Label plusTwoPlusFourLabel;
+    private Label plusTwoPlusFourMessage;
+
+    @FXML
+    private Label attackMessage;
 
     private Player humanPlayer;
     private Player machinePlayer;
@@ -71,7 +73,7 @@ public class GameUnoController implements Observer {
     public void initialize() {
         initVariables();
         setImages();
-        this.gameUno.addObserver(this);
+        this.gameUno.addObserver((this);
         this.gameUno.startGame();
 
         printCardsHumanPlayer();
@@ -81,7 +83,7 @@ public class GameUnoController implements Observer {
         Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNO");
         t.start();
 
-        threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.tableImageView, this);
+        threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.tableImageView);
         threadPlayMachine.start();
     }
 
@@ -121,6 +123,18 @@ public class GameUnoController implements Observer {
     /**
      * Prints the human player's cards on the grid pane.
      */
+    private boolean findCardMachine(String path){
+        for(Card card : machinePlayer.getCardsPlayer()){
+            System.out.println(card.getPath());
+            if(card.getPath().equals(path)){
+                System.out.println("found");
+                return true;
+            }
+        }
+        System.out.println("not found");
+        return false;
+    }
+
     private void printCardsHumanPlayer() {
         this.gridPaneCardsPlayer.getChildren().clear();
         Card[] currentVisibleCardsHumanPlayer = this.gameUno.getCurrentVisibleCardsHumanPlayer(this.posInitCardToShow);
@@ -131,46 +145,65 @@ public class GameUnoController implements Observer {
 
             cardImageView.setOnMouseClicked((MouseEvent event) -> {
                 // Verify if the card can be played on the table
-                plusTwoPlusFourLabel.setVisible(false);
+                plusTwoPlusFourMessage.setVisible(false);
+                attackMessage.setVisible(false);
 
                 if (table.isEmpty()) {
                     printCardsHumanByCases(card);
+                    hasPlayerPlayed(true);
 
                 } else if (card.getPath().contains("2_wild_draw")) {
-                    if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
+                    if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())){
                         //Two cards are added to the machine´s array of cards
-                        printCardsHumanByCases(card);
-                        plusTwoPlusFourLabel.setText("Machine: +2");
-                        plusTwoPlusFourLabel.setVisible(true);
-                        gameUno.eatCard(machinePlayer, 2);
+                        if(findCardMachine(card.getPath())){
+                            printCardsHumanByCases(card);
+                            changeMachinePlayer(card);
+                            attackMessage.setText("La maquina ha contraatacado");
+                            attackMessage.setVisible(true);
+                            hasPlayerPlayed(false);
+
+                        }else{
+                            printCardsHumanByCases(card);
+                            hasPlayerPlayed(true);
+                            plusTwoPlusFourMessage.setText("Maquina: +2");
+                            plusTwoPlusFourMessage.setVisible(true);
+                            gameUno.eatCard(machinePlayer, 2);
+                        }
+
+
                     }
 
                 } else if (card.getPath().contains("4_wild_draw")) {
                     //Four cards are added to the machine´s array of cards
                     printCardsHumanByCases(card);
-                    plusTwoPlusFourLabel.setText("Machine: +4");
-                    plusTwoPlusFourLabel.setVisible(true);
-                    gameUno.eatCard(machinePlayer, 4);
+                    hasPlayerPlayed(true);
+                    plusTwoPlusFourMessage.setText("Maquina: +4");
+                    plusTwoPlusFourMessage.setVisible(true);
+                    //gameUno.eatCard(machinePlayer, 4);
 
                 } else if (card.getPath().contains("reserve_")) {
                     if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
                         //Give the turn to machine on reverse
                         printCardsHumanByCases(card);
+                        hasPlayerPlayed(true);
                     }
 
                 } else if (card.getPath().contains("skip_")) {
                     if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
                         //Skip turn to machine - stop
                         printCardsHumanByCases(card);
+                        attackMessage.setText("Oponente Bloqueado\n       Vuelve a tirar");
+                        attackMessage.setVisible(true);
+                        hasPlayerPlayed(false);
                     }
 
                 } else if (card.getPath().contains("wild")) {
-                    System.out.println(card.getPath());
-                    //Skip turn to machine - stop
                     printCardsHumanByCases(card);
+                    hasPlayerPlayed(true);
 
                 } else if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor()) || table.getCurrentCardOnTheTable().getValue().equals(card.getValue())) {
                     printCardsHumanByCases(card);
+                    hasPlayerPlayed(true);
                 }
 
             });
@@ -183,12 +216,19 @@ public class GameUnoController implements Observer {
         gameUno.playCard(card);
         tableImageView.setImage(card.getImage());
         humanPlayer.removeCard(findPosCardsHumanPlayer(card));
-        threadPlayMachine.setHasPlayerPlayed(true);
         printCardsHumanPlayer();
     }
+r() {
+    public void hasPlayerPlayed(boolean bool){
+        threadPlayMachine.setHasPlayerPlayed(bool);
+    }
 
-    private void printCardsMachinePlayer() {
-        Platform.runLater(() -> {
+    public void changeMachinePlayer(Card card){
+        ThreadPlayMachine.putCardOnTableByPath(card);
+    }
+
+
+        private void printCardsMachinePlaye   Platform.runLater(() -> {
             this.gridPaneCardsMachine.getChildren().clear();
             Card[] currentVisibleCardsMachinePlayer = this.gameUno.getCurrentVisibleCardsMachinePlayer(this.posInitCardToShow1);
 
@@ -197,15 +237,14 @@ public class GameUnoController implements Observer {
                 Image cardMachine = new Image(getClass().getResourceAsStream(EISCUnoEnum.CARD_UNO.getFilePath()));
                 ImageView cardImageView = new ImageView(cardMachine);
 
-                cardImageView.setY(16);
-                cardImageView.setFitHeight(90);
-                cardImageView.setFitWidth(70);
+            cardImageView.setY(16);
+            cardImageView.setFitHeight(90);
+            cardImageView.setFitWidth(70);
 
-                this.gridPaneCardsMachine.add(cardImageView, i, 0);
-            }
-        });
-    }
-
+            this.gridPaneCardsMachine.add(cardImageView, i, 0);
+        }
+    });
+}
     /**
      * Finds the position of a specific card in the human player's hand.
      *
