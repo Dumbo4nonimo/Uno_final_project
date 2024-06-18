@@ -2,19 +2,25 @@ package org.example.eiscuno.model.game;
 
 import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.deck.Deck;
+import org.example.eiscuno.model.observer.Observer;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
+import org.example.eiscuno.model.observer.Observable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a game of Uno.
  * This class manages the game logic and interactions between players, deck, and the table.
  */
-public class GameUno implements IGameUno {
+public class GameUno implements IGameUno,Observable {
 
     private Player humanPlayer;
     private Player machinePlayer;
     private Deck deck;
     private Table table;
+    private List<Observer> observers;
 
     /**
      * Constructs a new GameUno instance.
@@ -23,18 +29,37 @@ public class GameUno implements IGameUno {
      * @param machinePlayer The machine player participating in the game.
      * @param deck          The deck of cards used in the game.
      * @param table         The table where cards are placed during the game.
+     *
      */
     public GameUno(Player humanPlayer, Player machinePlayer, Deck deck, Table table) {
         this.humanPlayer = humanPlayer;
         this.machinePlayer = machinePlayer;
         this.deck = deck;
         this.table = table;
+        this.observers = new ArrayList<>();
+    }
+    @Override
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update();
+        }
     }
 
     /**
      * Starts the Uno game by distributing cards to players.
      * The human player and the machine player each receive 10 cards from the deck.
      */
+
     @Override
     public void startGame() {
         for (int i = 0; i < 10; i++) {
@@ -44,29 +69,20 @@ public class GameUno implements IGameUno {
                 machinePlayer.addCard(this.deck.takeCard());
             }
         }
+        notifyObservers();  // Notificar a los observadores después de iniciar el juego
     }
 
-    /**
-     * Allows a player to draw a specified number of cards from the deck.
-     *
-     * @param player        The player who will draw cards.
-     * @param numberOfCards The number of cards to draw.
-     */
     @Override
     public void eatCard(Player player, int numberOfCards) {
         for (int i = 0; i < numberOfCards; i++) {
             player.addCard(this.deck.takeCard());
         }
+        notifyObservers();  // Notificar a los observadores después de que el jugador coma una carta
     }
-
-    /**
-     * Places a card on the table during the game.
-     *
-     * @param card The card to be placed on the table.
-     */
     @Override
     public void playCard(Card card) {
         this.table.addCardOnTheTable(card);
+        notifyObservers();  // Notificar a los observadores después de jugar una carta
     }
 
     /**
@@ -123,4 +139,5 @@ public class GameUno implements IGameUno {
     public Boolean isGameOver() {
         return null;
     }
+
 }
