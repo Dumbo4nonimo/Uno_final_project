@@ -8,10 +8,11 @@ import org.example.eiscuno.model.table.Table;
 import java.util.ArrayList;
 
 public class ThreadPlayMachine extends Thread {
-    private Table table;
-    private Player machinePlayer;
-    private ImageView tableImageView;
+    private static Table table;
+    private static Player machinePlayer;
+    private static ImageView tableImageView;
     private volatile boolean hasPlayerPlayed;
+
 
 
     public ThreadPlayMachine(Table table, Player machinePlayer, ImageView tableImageView) {
@@ -44,6 +45,18 @@ public class ThreadPlayMachine extends Thread {
         Card card = machinePlayer.getCard(index);
         table.addCardOnTheTable(card);
         tableImageView.setImage(card.getImage());
+    }
+
+    public static void putCardOnTableByPath(Card arg){
+        int counter = 0;
+        for(Card card : machinePlayer.getCardsPlayer()){
+            if(card.getPath().equals(arg.getPath())){
+                Card obj = machinePlayer.getCard(counter);
+                table.addCardOnTheTable(obj);
+                tableImageView.setImage(obj.getImage());
+            }
+            counter ++;
+        }
     }
 
     public void setHasPlayerPlayed(boolean hasPlayerPlayed) {
