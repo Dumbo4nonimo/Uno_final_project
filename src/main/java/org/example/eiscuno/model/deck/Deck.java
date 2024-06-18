@@ -36,6 +36,8 @@ public class Deck {
                     cardEnum.name().equals("WILD")) {
                 Card card = new Card(cardEnum.getFilePath(), getCardValue(cardEnum.name()), getCardColor(cardEnum.name()));
                 deckOfCards.push(card);
+                // Print each card
+                System.out.println(card.getValue() + " " + card.getColor());
             }
         }
         Collections.shuffle(deckOfCards);
@@ -62,27 +64,34 @@ public class Deck {
             return "8";
         } else if (name.endsWith("9")){
             return "9";
+        } else if (name.contains("RESERVE")) {
+            return "RESERVE";
+        } else if (name.contains("TWO_WILD_DRAW")) {
+            return "+2";
+        } else if (name.equals("FOUR_WILD_DRAW")) {
+            return "+4";
+        } else if (name.equals("WILD")) {
+            return "WILD";
+        } else if (name.contains("SKIP")) {
+            return "SKIP";
         } else {
-            return null;
+            return "NON_VALUE";
         }
 
     }
 
     private String getCardColor(String name){
-        if(name.startsWith("GREEN")){
+        if(name.contains("GREEN")){
             return "GREEN";
-        } else if(name.startsWith("YELLOW")){
+        } else if(name.contains("YELLOW")){
             return "YELLOW";
-        } else if(name.startsWith("BLUE")){
+        } else if(name.contains("BLUE")){
             return "BLUE";
-        } else if(name.startsWith("RED")){
+        } else if(name.contains("RED")){
             return "RED";
         } else {
-            return null;
+            return "NON_COLOR";
         }
-    }
-    public void takeACard(){
-
     }
 
     /**

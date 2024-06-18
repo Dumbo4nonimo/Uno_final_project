@@ -76,7 +76,7 @@ public class GameUno implements IGameUno {
      */
     @Override
     public void haveSungOne(String playerWhoSang) {
-        if (playerWhoSang.equals("HUMAN_PLAYER")) {
+        if (playerWhoSang.equals(humanPlayer.getTypePlayer())) {
             machinePlayer.addCard(this.deck.takeCard());
         } else {
             humanPlayer.addCard(this.deck.takeCard());

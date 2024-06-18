@@ -13,7 +13,7 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="711.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.eiscuno.controller.GameUnoController">
    <left>
-      <Pane prefHeight="200.0" prefWidth="240.0" BorderPane.alignment="CENTER">
+      <Pane prefHeight="200.0" prefWidth="184.0" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="takeCardButton" layoutX="68.0" layoutY="25.0" mnemonicParsing="false" onAction="#onHandleTakeCard" prefHeight="150.0" prefWidth="105.0" style="-fx-background-color: F76849; -fx-border-color: E03D1A;" />
          </children>
@@ -29,15 +29,20 @@
    <center>
       <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <ImageView fx:id="tableImageView" fitHeight="149.0" fitWidth="100.0" layoutX="79.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="tableImageView" fitHeight="149.0" fitWidth="100.0" layoutX="112.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true" />
             <Label fx:id="sayOne" layoutX="39.0" layoutY="-21.0" prefHeight="30.0" prefWidth="145.0" style="-fx-alignment: center; -fx-background-color: skyblue; -fx-border-radius: 39;" text="Te han cantado UNO" visible="false" />
+            <Label fx:id="plusTwoPlusFourLabel" layoutX="14.0" layoutY="26.0" prefHeight="19.0" prefWidth="94.0" style="-fx-background-color: E03D1A;" textFill="#f7f2f2" visible="false">
+               <font>
+                  <Font name="Bell MT" size="15.0" />
+               </font>
+            </Label>
          </children>
       </Pane>
    </center>
    <top>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="logoEiscUno" prefHeight="80.0" prefWidth="90.0" text="EISC Uno" textFill="RED">
+            <Label fx:id="logoEiscUno" prefHeight="77.0" prefWidth="87.0" text="EISC Uno" textFill="RED">
                <font>
                   <Font name="Berlin Sans FB Bold" size="18.0" />
                </font>

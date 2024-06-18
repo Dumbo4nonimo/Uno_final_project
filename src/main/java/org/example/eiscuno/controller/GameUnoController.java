@@ -5,7 +5,6 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -45,6 +44,9 @@ public class GameUnoController {
 
     @FXML
     private Button takeCardButton;
+
+    @FXML
+    private Label plusTwoPlusFourLabel;
 
     private Player humanPlayer;
     private Player machinePlayer;
@@ -122,18 +124,66 @@ public class GameUnoController {
         for (int i = 0; i < currentVisibleCardsHumanPlayer.length; i++) {
             Card card = currentVisibleCardsHumanPlayer[i];
             ImageView cardImageView = card.getCard();
+
             cardImageView.setOnMouseClicked((MouseEvent event) -> {
                 // Verify if the card can be played on the table
-                gameUno.playCard(card);
-                tableImageView.setImage(card.getImage());
-                humanPlayer.removeCard(findPosCardsHumanPlayer(card));
-                threadPlayMachine.setHasPlayerPlayed(true);
-                printCardsHumanPlayer();
+                plusTwoPlusFourLabel.setVisible(false);
+
+                if (table.isEmpty()) {
+                    printCardsHumanByCases(card);
+
+                } else if (card.getPath().contains("2_wild_draw")) {
+                    if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())){
+                        //Two cards are added to the machine´s array of cards
+                        printCardsHumanByCases(card);
+                        plusTwoPlusFourLabel.setText("Machine: +2");
+                        plusTwoPlusFourLabel.setVisible(true);
+                        gameUno.eatCard(machinePlayer, 2);
+                    }
+
+                } else if (card.getPath().contains("4_wild_draw")) {
+                    //Four cards are added to the machine´s array of cards
+                    printCardsHumanByCases(card);
+                    plusTwoPlusFourLabel.setText("Machine: +4");
+                    plusTwoPlusFourLabel.setVisible(true);
+                    gameUno.eatCard(machinePlayer, 4);
+
+                } else if (card.getPath().contains("reserve_")) {
+                    if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
+                        //Give the turn to machine on reverse
+                        printCardsHumanByCases(card);
+                    }
+
+                } else if (card.getPath().contains("skip_")) {
+                    if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
+                        //Skip turn to machine - stop
+                        printCardsHumanByCases(card);
+                    }
+
+                } else if (card.getPath().contains("wild")) {
+                    System.out.println(card.getPath());
+                    //Skip turn to machine - stop
+                    printCardsHumanByCases(card);
+
+                } else if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor()) || table.getCurrentCardOnTheTable().getValue().equals(card.getValue())) {
+                    printCardsHumanByCases(card);
+                }
+
             });
+
 
             this.gridPaneCardsPlayer.add(cardImageView, i, 0);
         }
     }
+
+    public void printCardsHumanByCases(Card card){
+        gameUno.playCard(card);
+        tableImageView.setImage(card.getImage());
+        humanPlayer.removeCard(findPosCardsHumanPlayer(card));
+        threadPlayMachine.setHasPlayerPlayed(true);
+        printCardsHumanPlayer();
+    }
+
     private void printCardsMachinePlayer() {
         this.gridPaneCardsMachine.getChildren().clear();
         Card[] currentVisibleCardsMachinePlayer = this.gameUno.getCurrentVisibleCardsMachinePlayer(this.posInitCardToShow);

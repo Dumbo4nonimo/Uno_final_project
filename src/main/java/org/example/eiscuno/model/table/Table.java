@@ -17,6 +17,10 @@ public class Table {
         this.cardsTable = new ArrayList<Card>();
     }
 
+    public boolean isEmpty(){
+        return this.cardsTable.isEmpty();
+    }
+
     /**
      * Adds a card to the table.
      *

@@ -7,7 +7,7 @@ import javafx.scene.image.ImageView;
  * Represents a card in the Uno game.
  */
 public class Card {
-    private String url;
+    private String path;
     private String value;
     private String color;
     private Image image;
@@ -16,14 +16,14 @@ public class Card {
     /**
      * Constructs a Card with the specified image URL and name.
      *
-     * @param url the URL of the card image
+     * @param path the URL of the card image
      * @param value of the card
      */
-    public Card(String url, String value, String color) {
-        this.url = url;
+    public Card(String path, String value, String color) {
+        this.path = path;
         this.value = value;
         this.color = color;
-        this.image = new Image(String.valueOf(getClass().getResource(url)));
+        this.image = new Image(String.valueOf(getClass().getResource(path)));
         this.cardImageView = createCardImageView();
     }
 
@@ -39,6 +39,8 @@ public class Card {
         card.setFitWidth(70);
         return card;
     }
+
+
 
     /**
      * Gets the ImageView representation of the card.
@@ -58,11 +60,14 @@ public class Card {
         return image;
     }
 
+
     public String getValue() {
         return value;
     }
 
     public String getColor() {
-        return color;
+            return color;
     }
+
+    public String getPath() {return path;}
 }
