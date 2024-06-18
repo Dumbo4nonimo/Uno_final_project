@@ -7,7 +7,6 @@ import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.controller.GameUnoController;
 
-import java.util.ArrayList;
 public class ThreadPlayMachine extends Thread {
     private static Table table;
     private static Player machinePlayer;
@@ -19,22 +18,22 @@ public class ThreadPlayMachine extends Thread {
         this.table = table;
         this.machinePlayer = machinePlayer;
         this.tableImageView = tableImageView;
-        this.hasPlayerPlayed = false;
         this.gameUnoController = gameUnoController;
+        this.hasPlayerPlayed = false;
     }
 
+    @Override
     public void run() {
-        int index = (int) (Math.random() * machinePlayer.getCardsPlayer().size());
-        while (true){
-            if(hasPlayerPlayed){
-                try{
+        while (true) {
+            if (hasPlayerPlayed) {
+                try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
                 putCardOnTheTable();
-                gameUnoController.incrementPosInitCardToShow1(); // Incrementa posInitCardToShow1 en el controlador
+                gameUnoController.incrementPosInitCardToShow1();
                 hasPlayerPlayed = false;
             }
         }
@@ -49,16 +48,19 @@ public class ThreadPlayMachine extends Thread {
         });
     }
 
-    public static void putCardOnTableByPath(Card arg){
-        int counter = 0;
-        for(Card card : machinePlayer.getCardsPlayer()){
-            if(card.getPath().equals(arg.getPath())){
-                Card obj = machinePlayer.getCard(counter);
-                table.addCardOnTheTable(obj);
-                tableImageView.setImage(obj.getImage());
+    public static void putCardOnTableByPath(Card arg) {
+        Platform.runLater(() -> {
+            int counter = 0;
+            for (Card card : machinePlayer.getCardsPlayer()) {
+                if (card.getPath().equals(arg.getPath())) {
+                    Card obj = machinePlayer.getCard(counter);
+                    table.addCardOnTheTable(obj);
+                    tableImageView.setImage(obj.getImage());
+                    break;
+                }
+                counter++;
             }
-            counter ++;
-        }
+        });
     }
 
     public void setHasPlayerPlayed(boolean hasPlayerPlayed) {

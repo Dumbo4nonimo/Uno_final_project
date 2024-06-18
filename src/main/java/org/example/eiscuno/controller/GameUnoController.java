@@ -24,7 +24,7 @@ import javafx.scene.control.Button;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class GameUnoController {
+public class GameUnoController implements Observer{
 
     @FXML
     private GridPane gridPaneCardsMachine;
@@ -73,7 +73,7 @@ public class GameUnoController {
     public void initialize() {
         initVariables();
         setImages();
-        this.gameUno.addObserver((this);
+        this.gameUno.addObserver(this);
         this.gameUno.startGame();
 
         printCardsHumanPlayer();
@@ -83,7 +83,7 @@ public class GameUnoController {
         Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNO");
         t.start();
 
-        threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.tableImageView);
+        threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.tableImageView,this);
         threadPlayMachine.start();
     }
 
@@ -218,24 +218,24 @@ public class GameUnoController {
         humanPlayer.removeCard(findPosCardsHumanPlayer(card));
         printCardsHumanPlayer();
     }
-r() {
-    public void hasPlayerPlayed(boolean bool){
+
+    public void hasPlayerPlayed ( boolean bool){
         threadPlayMachine.setHasPlayerPlayed(bool);
     }
 
-    public void changeMachinePlayer(Card card){
+    public void changeMachinePlayer (Card card){
         ThreadPlayMachine.putCardOnTableByPath(card);
     }
 
 
-        private void printCardsMachinePlaye   Platform.runLater(() -> {
-            this.gridPaneCardsMachine.getChildren().clear();
-            Card[] currentVisibleCardsMachinePlayer = this.gameUno.getCurrentVisibleCardsMachinePlayer(this.posInitCardToShow1);
+    private void printCardsMachinePlayer() {
+        this.gridPaneCardsMachine.getChildren().clear();
+        Card[] currentVisibleCardsMachinePlayer = this.gameUno.getCurrentVisibleCardsMachinePlayer(this.posInitCardToShow1);
 
-            for (int i = 0; i < currentVisibleCardsMachinePlayer.length; i++) {
-                Card card = currentVisibleCardsMachinePlayer[i];
-                Image cardMachine = new Image(getClass().getResourceAsStream(EISCUnoEnum.CARD_UNO.getFilePath()));
-                ImageView cardImageView = new ImageView(cardMachine);
+        for (int i = 0; i < currentVisibleCardsMachinePlayer.length; i++) {
+            Card card = currentVisibleCardsMachinePlayer[i];
+            Image cardMachine = new Image(getClass().getResourceAsStream(EISCUnoEnum.CARD_UNO.getFilePath()));
+            ImageView cardImageView = new ImageView(cardMachine);
 
             cardImageView.setY(16);
             cardImageView.setFitHeight(90);
@@ -243,8 +243,9 @@ r() {
 
             this.gridPaneCardsMachine.add(cardImageView, i, 0);
         }
-    });
+
 }
+
     /**
      * Finds the position of a specific card in the human player's hand.
      *
@@ -317,7 +318,7 @@ r() {
             unoButtonPressed.set(true);
 
 
-        } else if(unoMachine==1) {
+        } else if (unoMachine == 1) {
             gameUno.eatCard(machinePlayer, 1);
         }
         this.gameUno.notifyObservers();
@@ -360,5 +361,5 @@ r() {
             this.posInitCardToShow1++;
             printCardsMachinePlayer();
         });
-}
+    }
 }
