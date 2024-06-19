@@ -48,7 +48,10 @@ public class GameUnoController implements Observer {
     private Button takeCardButton;
 
     @FXML
-    private Label plusTwoPlusFourLabel;
+    private Label plusTwoPlusFourMessage;
+
+    @FXML
+    private Label attackMessage;
 
     private Player humanPlayer;
     private Player machinePlayer;
@@ -95,7 +98,9 @@ public class GameUnoController implements Observer {
         this.table = new Table();
         this.gameUno = new GameUno(this.humanPlayer, this.machinePlayer, this.deck, this.table);
         this.posInitCardToShow = 0;
-        this.posInitCardToShow1=0;
+        this.posInitCardToShow1 = 0;
+
+
     }
 
     public void setImages() {
@@ -118,6 +123,20 @@ public class GameUnoController implements Observer {
         unoButton.setGraphic(imageViewUnoButton);
     }
 
+    private boolean findCardMachine(String path) {
+        for (Card card : machinePlayer.getCardsPlayer()) {
+            System.out.println(card.getPath());
+            if (card.getPath().equals(path)) {
+                System.out.println("found");
+                return true;
+            }
+        }
+        System.out.println("not found");
+        return false;
+    }
+
+
+
     /**
      * Prints the human player's cards on the grid pane.
      */
@@ -131,49 +150,69 @@ public class GameUnoController implements Observer {
 
             cardImageView.setOnMouseClicked((MouseEvent event) -> {
                 // Verify if the card can be played on the table
-                plusTwoPlusFourLabel.setVisible(false);
+                plusTwoPlusFourMessage.setVisible(false);
+                attackMessage.setVisible(false);
 
                 if (table.isEmpty()) {
                     printCardsHumanByCases(card);
+                    hasPlayerPlayed(true);
 
                 } else if (card.getPath().contains("2_wild_draw")) {
                     if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
                         //Two cards are added to the machine´s array of cards
-                        printCardsHumanByCases(card);
-                        plusTwoPlusFourLabel.setText("Machine: +2");
-                        plusTwoPlusFourLabel.setVisible(true);
-                        gameUno.eatCard(machinePlayer, 2);
+                        if (findCardMachine(card.getPath())) {
+                            printCardsHumanByCases(card);
+                            changeMachinePlayer(card);
+                            attackMessage.setText("La maquina ha contraatacado");
+                            attackMessage.setVisible(true);
+                            hasPlayerPlayed(false);
+
+                        } else {
+                            printCardsHumanByCases(card);
+                            hasPlayerPlayed(true);
+                            plusTwoPlusFourMessage.setText("Maquina: +2");
+                            plusTwoPlusFourMessage.setVisible(true);
+                            gameUno.eatCard(machinePlayer, 2);
+                        }
+
+
                     }
 
                 } else if (card.getPath().contains("4_wild_draw")) {
                     //Four cards are added to the machine´s array of cards
                     printCardsHumanByCases(card);
-                    plusTwoPlusFourLabel.setText("Machine: +4");
-                    plusTwoPlusFourLabel.setVisible(true);
-                    gameUno.eatCard(machinePlayer, 4);
+                    hasPlayerPlayed(true);
+                    plusTwoPlusFourMessage.setText("Maquina: +4");
+                    plusTwoPlusFourMessage.setVisible(true);
+                    //gameUno.eatCard(machinePlayer, 4);
 
                 } else if (card.getPath().contains("reserve_")) {
                     if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
                         //Give the turn to machine on reverse
                         printCardsHumanByCases(card);
+                        hasPlayerPlayed(true);
                     }
 
                 } else if (card.getPath().contains("skip_")) {
                     if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
                         //Skip turn to machine - stop
                         printCardsHumanByCases(card);
+                        attackMessage.setText("Oponente Bloqueado\n       Vuelve a tirar");
+                        attackMessage.setVisible(true);
+                        hasPlayerPlayed(false);
                     }
 
                 } else if (card.getPath().contains("wild")) {
-                    System.out.println(card.getPath());
-                    //Skip turn to machine - stop
                     printCardsHumanByCases(card);
+                    hasPlayerPlayed(true);
 
                 } else if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor()) || table.getCurrentCardOnTheTable().getValue().equals(card.getValue())) {
                     printCardsHumanByCases(card);
+                    hasPlayerPlayed(true);
                 }
 
             });
+
 
             this.gridPaneCardsPlayer.add(cardImageView, i, 0);
         }
@@ -183,9 +222,17 @@ public class GameUnoController implements Observer {
         gameUno.playCard(card);
         tableImageView.setImage(card.getImage());
         humanPlayer.removeCard(findPosCardsHumanPlayer(card));
-        threadPlayMachine.setHasPlayerPlayed(true);
         printCardsHumanPlayer();
     }
+
+    public void hasPlayerPlayed(boolean bool) {
+        threadPlayMachine.setHasPlayerPlayed(bool);
+    }
+
+    public void changeMachinePlayer(Card card) {
+        ThreadPlayMachine.putCardOnTableByPath(card);
+    }
+
 
     private void printCardsMachinePlayer() {
         Platform.runLater(() -> {
@@ -278,7 +325,7 @@ public class GameUnoController implements Observer {
             unoButtonPressed.set(true);
 
 
-        } else if(unoMachine==1) {
+        } else if (unoMachine == 1) {
             gameUno.eatCard(machinePlayer, 1);
         }
         this.gameUno.notifyObservers();
@@ -321,5 +368,5 @@ public class GameUnoController implements Observer {
             this.posInitCardToShow1++;
             printCardsMachinePlayer();
         });
-}
+    }
 }

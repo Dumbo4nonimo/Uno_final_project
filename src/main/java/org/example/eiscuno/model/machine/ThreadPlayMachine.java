@@ -9,16 +9,16 @@ import org.example.eiscuno.controller.GameUnoController;
 
 import java.util.ArrayList;
 public class ThreadPlayMachine extends Thread {
-    private Table table;
-    private Player machinePlayer;
-    private ImageView tableImageView;
+    private static Table table;
+    private static Player machinePlayer;
+    private static ImageView tableImageView;
     private volatile boolean hasPlayerPlayed;
     private GameUnoController gameUnoController;
 
     public ThreadPlayMachine(Table table, Player machinePlayer, ImageView tableImageView, GameUnoController gameUnoController) {
-        this.table = table;
-        this.machinePlayer = machinePlayer;
-        this.tableImageView = tableImageView;
+        ThreadPlayMachine.table = table;
+        ThreadPlayMachine.machinePlayer = machinePlayer;
+        ThreadPlayMachine.tableImageView = tableImageView;
         this.hasPlayerPlayed = false;
         this.gameUnoController = gameUnoController;
     }
@@ -48,6 +48,20 @@ public class ThreadPlayMachine extends Thread {
             tableImageView.setImage(card.getImage());
         });
     }
+
+    public static void putCardOnTableByPath(Card arg){
+        int counter = 0;
+        for(Card card : machinePlayer.getCardsPlayer()){
+            if(card.getPath().equals(arg.getPath())){
+                Card obj = machinePlayer.getCard(counter);
+                table.addCardOnTheTable(obj);
+                tableImageView.setImage(obj.getImage());
+            }
+            counter ++;
+        }
+    }
+
+
 
     public void setHasPlayerPlayed(boolean hasPlayerPlayed) {
         this.hasPlayerPlayed = hasPlayerPlayed;
