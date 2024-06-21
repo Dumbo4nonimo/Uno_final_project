@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ee8ff40-bbdd-4aec-a3d2-cf5cc45130ec" name="Changes" comment="">
+    <list default="true" id="1ee8ff40-bbdd-4aec-a3d2-cf5cc45130ec" name="Changes" comment="First Part of Test">
+      <change afterPath="$PROJECT_DIR$/src/test/java/org/example/eiscuno/model/tableTest/TableTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/example/eiscuno/model/table/TableTest.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +62,10 @@
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "Application.HelloApplication.executor": "Run",
     "Application.Main.executor": "Run",
+    "JUnit.TableTest.executor": "Run",
+    "JUnit.TableTest.secondCardAddedTest.executor": "Run",
+    "JUnit.TableTest.tableShouldHaveA3RedCard (1).executor": "Coverage",
+    "JUnit.TableTest.tableShouldHaveA3RedCard.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
@@ -71,7 +78,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -87,7 +94,7 @@
       <command value="git reset --hard HEAD " />
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="JUnit.TableTest.secondCardAddedTest">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.Main" />
       <module name="eisc-uno" />
@@ -101,8 +108,75 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="TableTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="eisc-uno" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.eiscuno.model.table.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.example.eiscuno.model.table" />
+      <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.model.table.TableTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TableTest.secondCardAddedTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="eisc-uno" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.eiscuno.model.tableTest.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.example.eiscuno.model.tableTest" />
+      <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.model.tableTest.TableTest" />
+      <option name="METHOD_NAME" value="secondCardAddedTest" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TableTest.tableShouldHaveA3RedCard (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="eisc-uno" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.eiscuno.model.tableTest.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.example.eiscuno.model.tableTest" />
+      <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.model.tableTest.TableTest" />
+      <option name="METHOD_NAME" value="tableShouldHaveA3RedCard" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TableTest.tableShouldHaveA3RedCard" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="eisc-uno" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.eiscuno.model.table.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.example.eiscuno.model.table" />
+      <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.model.table.TableTest" />
+      <option name="METHOD_NAME" value="tableShouldHaveA3RedCard" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.TableTest.secondCardAddedTest" />
+        <item itemvalue="JUnit.TableTest.tableShouldHaveA3RedCard (1)" />
+        <item itemvalue="JUnit.TableTest.tableShouldHaveA3RedCard" />
+        <item itemvalue="JUnit.TableTest" />
         <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
@@ -110,8 +184,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.15989.150" />
-        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-IU-241.15989.150" />
+        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-322ed176" />
       </set>
     </attachedChunks>
   </component>
@@ -145,6 +218,15 @@
       <workItem from="1717853787588" duration="7091000" />
       <workItem from="1718715835620" duration="842000" />
       <workItem from="1718716697195" duration="9712000" />
+      <workItem from="1718753765459" duration="1967000" />
+      <workItem from="1718757895718" duration="1567000" />
+      <workItem from="1718761277882" duration="845000" />
+      <workItem from="1718762271693" duration="34000" />
+      <workItem from="1718762312328" duration="24000" />
+      <workItem from="1718762357296" duration="834000" />
+      <workItem from="1718763380055" duration="341000" />
+      <workItem from="1718764862668" duration="963000" />
+      <workItem from="1718813026181" duration="6327000" />
     </task>
     <task id="LOCAL-00001" summary=".">
       <option name="closed" value="true" />
@@ -154,7 +236,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718748712634</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="First Part of Test">
+      <option name="closed" value="true" />
+      <created>1718749786015</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1718749786015</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -163,6 +253,15 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Buttons" />
     <MESSAGE value="." />
-    <option name="LAST_COMMIT_MESSAGE" value="." />
+    <MESSAGE value="First Part of Test" />
+    <option name="LAST_COMMIT_MESSAGE" value="First Part of Test" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Uno_final_project$TableTest_tableShouldHaveA3RedCard__1_.ic" NAME="TableTest.tableShouldHaveA3RedCard (1) Coverage Results" MODIFIED="1718827201841" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>org.example.eiscuno.model.tableTest.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/Uno_final_project$TableTest_tableShouldHaveA3RedCard.ic" NAME="TableTest.tableShouldHaveA3RedCard Coverage Results" MODIFIED="1718816649552" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>org.example.eiscuno.model.table.*</FILTER>
+    </SUITE>
   </component>
 </project>
