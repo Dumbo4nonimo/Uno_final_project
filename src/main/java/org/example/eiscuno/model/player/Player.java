@@ -1,5 +1,6 @@
 package org.example.eiscuno.model.player;
 
+import org.example.eiscuno.model.alert.AlertBox;
 import org.example.eiscuno.model.card.Card;
 
 import java.util.ArrayList;
@@ -26,7 +27,13 @@ public class Player implements IPlayer {
      */
     @Override
     public void addCard(Card card){
-        cardsPlayer.add(card);
+        if(card != null){
+            cardsPlayer.add(card);
+        }else{
+            AlertBox alertBox = new AlertBox();
+            alertBox.showMessage("Alerta", "Ya no hay mas cartas sobre la baraja","Termina el juego con las que tienes.");
+        }
+
     }
 
     /**
@@ -46,7 +53,13 @@ public class Player implements IPlayer {
      */
     @Override
     public void removeCard(int index) {
-        cardsPlayer.remove(index);
+        try{
+            cardsPlayer.remove(index);
+        }catch (IndexOutOfBoundsException e){
+            cardsPlayer.remove(index - 1);
+            System.out.println("menos 1");
+        }
+
     }
 
     /**

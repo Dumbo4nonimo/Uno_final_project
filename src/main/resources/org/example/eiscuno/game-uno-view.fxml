@@ -11,11 +11,12 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="711.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.eiscuno.controller.GameUnoController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="711.0" style="-fx-background-color: orange;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.eiscuno.controller.GameUnoController">
    <left>
       <Pane prefHeight="200.0" prefWidth="184.0" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="takeCardButton" layoutX="68.0" layoutY="25.0" mnemonicParsing="false" onAction="#onHandleTakeCard" prefHeight="150.0" prefWidth="105.0" style="-fx-background-color: F76849; -fx-border-color: E03D1A;" />
+            <Button layoutX="70.0" layoutY="204.0" mnemonicParsing="false" onAction="#skipTurnOnAction" prefHeight="25.0" prefWidth="94.0" style="-fx-background-color: white;" text=" Saltar turno" textFill="#d70909" />
          </children>
       </Pane>
    </left>
@@ -30,10 +31,15 @@
       <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
             <ImageView fx:id="tableImageView" fitHeight="149.0" fitWidth="100.0" layoutX="112.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true" />
-            <Label fx:id="sayOne" layoutX="39.0" layoutY="-21.0" prefHeight="30.0" prefWidth="145.0" style="-fx-alignment: center; -fx-background-color: skyblue; -fx-border-radius: 39;" text="Te han cantado UNO" visible="false" />
-            <Label fx:id="plusTwoPlusFourLabel" layoutX="14.0" layoutY="26.0" prefHeight="19.0" prefWidth="94.0" style="-fx-background-color: E03D1A;" textFill="#f7f2f2" visible="false">
+            <Label fx:id="sayOne" alignment="CENTER" layoutX="65.0" layoutY="-12.0" prefHeight="31.0" prefWidth="162.0" style="-fx-alignment: center; -fx-background-color: skyblue; -fx-border-radius: 39;" text="Te han cantado UNO" visible="false" />
+            <Label fx:id="plusTwoPlusFourMessage" layoutX="14.0" layoutY="26.0" prefHeight="19.0" prefWidth="94.0" style="-fx-background-color: E03D1A;" textFill="#7f2281" visible="false">
                <font>
                   <Font name="Bell MT" size="15.0" />
+               </font>
+            </Label>
+            <Label fx:id="attackMessage" alignment="CENTER" layoutX="39.0" layoutY="185.0" prefHeight="42.0" prefWidth="233.0" style="-fx-background-color: F76849;" textFill="#9c1c95" visible="false">
+               <font>
+                  <Font name="Century Gothic" size="12.0" />
                </font>
             </Label>
          </children>
@@ -42,7 +48,7 @@
    <top>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="logoEiscUno" prefHeight="77.0" prefWidth="87.0" text="EISC Uno" textFill="RED">
+            <Label fx:id="logoEiscUno" prefHeight="78.0" prefWidth="76.0" text="EISC Uno" textFill="RED">
                <font>
                   <Font name="Berlin Sans FB Bold" size="18.0" />
                </font>
@@ -58,14 +64,14 @@
                   <RowConstraints />
                </rowConstraints>
             </GridPane>
-            <Button fx:id="exitButton" mnemonicParsing="false" onAction="#onHandleButtonExit" style="-fx-background-color: white;" text="Salir" textFill="#e14747" />
+            <Button fx:id="exitButton" mnemonicParsing="false" onAction="#onHandleButtonExit" prefHeight="27.0" prefWidth="66.0" style="-fx-background-color: white; -fx-border-color: red;" text="Salir" textFill="#f70505" />
          </children>
       </HBox>
    </top>
    <bottom>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" onAction="#onHandleBack" prefWidth="74.0" style="-fx-background-color: red;" text="Anterior" textFill="WHITE">
+            <Button mnemonicParsing="false" onAction="#onHandleBack" prefWidth="74.0" style="-fx-background-color: red; -fx-border-color: F76849;" text="Anterior" textFill="WHITE">
                <font>
                   <Font name="Berlin Sans FB" size="12.0" />
                </font></Button>
@@ -80,7 +86,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
             </GridPane>
-            <Button mnemonicParsing="false" onAction="#onHandleNext" prefWidth="74.0" style="-fx-background-color: RED;" text="Siguiente" textFill="WHITE" />
+            <Button mnemonicParsing="false" onAction="#onHandleNext" prefWidth="74.0" style="-fx-background-color: RED; -fx-border-color: F76849;" text="Siguiente" textFill="WHITE" />
          </children>
       </HBox>
    </bottom>
