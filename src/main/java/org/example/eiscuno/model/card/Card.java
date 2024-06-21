@@ -10,6 +10,7 @@ public class Card {
     private String path;
     private String value;
     private String color;
+    private boolean isSpecial;
     private Image image;
     private ImageView cardImageView;
 
@@ -19,10 +20,11 @@ public class Card {
      * @param path the URL of the card image
      * @param value of the card
      */
-    public Card(String path, String value, String color) {
+    public Card(String path, String value, String color, boolean isSpecial) {
         this.path = path;
         this.value = value;
         this.color = color;
+        this.isSpecial = isSpecial;
         this.image = new Image(String.valueOf(getClass().getResource(path)));
         this.cardImageView = createCardImageView();
     }
@@ -60,9 +62,12 @@ public class Card {
         return image;
     }
 
-
     public String getValue() {
         return value;
+    }
+
+    public boolean getIsSpecial(){
+        return isSpecial;
     }
 
     public String getColor() {

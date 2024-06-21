@@ -12,7 +12,7 @@ public enum EISCUnoEnum {
     BUTTON_UNO("images/button_uno.png"),
     CARD_UNO("cards-uno/card_uno.png"),
     DECK_OF_CARDS("cards-uno/deck_of_cards.png"),
-    WILD("cards-uno/wild.png"),
+    WILD("cards-uno/wild_change.png"),
     TWO_WILD_DRAW_BLUE("cards-uno/2_wild_draw_blue.png"),
     TWO_WILD_DRAW_GREEN("cards-uno/2_wild_draw_green.png"),
     TWO_WILD_DRAW_YELLOW("cards-uno/2_wild_draw_yellow.png"),
@@ -66,6 +66,7 @@ public enum EISCUnoEnum {
     RED_7("cards-uno/7_red.png"),
     RED_8("cards-uno/8_red.png"),
     RED_9("cards-uno/9_red.png");
+
 
     private final String filePath;
     private static final String PATH = "/org/example/eiscuno/";

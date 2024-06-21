@@ -1,8 +1,10 @@
 package org.example.eiscuno.model.deck;
 
+import org.example.eiscuno.model.alert.AlertBox;
 import org.example.eiscuno.model.unoenum.EISCUnoEnum;
 import org.example.eiscuno.model.card.Card;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Stack;
 
@@ -11,12 +13,16 @@ import java.util.Stack;
  */
 public class Deck {
     private Stack<Card> deckOfCards;
+    private ArrayList<Card> ghostCards;
+    private volatile boolean isThereCardsOnDeck;
 
     /**
      * Constructs a new deck of Uno cards and initializes it.
      */
     public Deck() {
         deckOfCards = new Stack<>();
+        ghostCards = new ArrayList<>();
+        isThereCardsOnDeck = true;
         initializeDeck();
     }
 
@@ -34,13 +40,52 @@ public class Deck {
                     cardEnum.name().startsWith("TWO_WILD_DRAW_") ||
                     cardEnum.name().equals("FOUR_WILD_DRAW") ||
                     cardEnum.name().equals("WILD")) {
-                Card card = new Card(cardEnum.getFilePath(), getCardValue(cardEnum.name()), getCardColor(cardEnum.name()));
+                Card card = new Card(cardEnum.getFilePath(), getCardValue(cardEnum.name()), getCardColor(cardEnum.name()), getIsSpecial(cardEnum.name()));
                 deckOfCards.push(card);
+                initGhostCards();
                 // Print each card
-                System.out.println(card.getValue() + " " + card.getColor());
+                //System.out.println(card.getValue() + " " + card.getColor());
             }
         }
         Collections.shuffle(deckOfCards);
+    }
+
+    private boolean getIsSpecial(String name){
+        if (name.endsWith("0")){
+            return false;
+        } else if (name.endsWith("1")){
+            return false;
+        } else if (name.endsWith("2")){
+            return false;
+        } else if (name.endsWith("3")){
+            return false;
+        } else if (name.endsWith("4")){
+            return false;
+        } else if (name.endsWith("5")){
+            return false;
+        } else if (name.endsWith("6")){
+            return false;
+        } else if (name.endsWith("7")){
+            return false;
+        } else if (name.endsWith("8")){
+            return false;
+        } else if (name.endsWith("9")){
+            return false;
+        } else if (name.contains("RESERVE")) {
+            return true;
+        } else if (name.contains("TWO_WILD_DRAW")) {
+            return true;
+        } else if (name.equals("FOUR_WILD_DRAW")) {
+            return true;
+        } else if (name.equals("WILD")) {
+            return true;
+        } else if (name.contains("SKIP")) {
+            return true;
+        } else {
+            System.out.println("Checkout deck.java with isSpecial");
+            return true;
+        }
+
     }
 
     private String getCardValue(String name) {
@@ -101,10 +146,31 @@ public class Deck {
      * @throws IllegalStateException if the deck is empty
      */
     public Card takeCard() {
-        if (deckOfCards.isEmpty()) {
-            throw new IllegalStateException("No hay más cartas en el mazo.");
+
+        try{
+            if (!deckOfCards.isEmpty()) {
+                return deckOfCards.pop();
+            }
+
+            isThereCardsOnDeck = false;
+
+        }catch (IllegalStateException e){
+            isThereCardsOnDeck = false;
         }
-        return deckOfCards.pop();
+
+        return null;
+
+    }
+
+    private void initGhostCards(){
+        ghostCards.add(new Card("", "NON_VALUE", "YELLOW", false));
+        ghostCards.add(new Card("", "NON_VALUE", "RED", false));
+        ghostCards.add(new Card("", "NON_VALUE", "BLUE", false));
+        ghostCards.add(new Card("", "NON_VALUE", "GREEN", false));
+    }
+
+    public ArrayList<Card> getGhostCards(){
+        return ghostCards;
     }
 
     /**
@@ -114,5 +180,9 @@ public class Deck {
      */
     public boolean isEmpty() {
         return deckOfCards.isEmpty();
+    }
+
+    public boolean getIsThereCardsOnDeck(){
+        return isThereCardsOnDeck;
     }
 }

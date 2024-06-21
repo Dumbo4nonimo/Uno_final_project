@@ -1,5 +1,6 @@
 package org.example.eiscuno.model.game;
 
+import org.example.eiscuno.model.alert.AlertBox;
 import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.deck.Deck;
 import org.example.eiscuno.model.observer.Observer;
@@ -74,8 +75,16 @@ public class GameUno implements IGameUno,Observable {
 
     @Override
     public void eatCard(Player player, int numberOfCards) {
+        Card card;
         for (int i = 0; i < numberOfCards; i++) {
-            player.addCard(this.deck.takeCard());
+            card = this.deck.takeCard();
+            if(card != null){
+                player.addCard(this.deck.takeCard());
+            }else{
+                AlertBox alertBox = new AlertBox();
+                alertBox.showMessage("Alerta", "Ya no hay mas cartas sobre la baraja","Termina el juego con las que tienes");
+
+            }
         }
         notifyObservers();  // Notificar a los observadores después de que el jugador coma una carta
     }
@@ -138,6 +147,10 @@ public class GameUno implements IGameUno,Observable {
     @Override
     public Boolean isGameOver() {
         return null;
+    }
+
+    public Player getHumanPlayer() {
+        return humanPlayer;
     }
 
 }
