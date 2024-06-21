@@ -5,6 +5,8 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -67,6 +69,7 @@ public class GameUnoController implements Observer {
 
     private final AtomicBoolean unoButtonPressed = new AtomicBoolean(false);
     private int posInitCardToShow1;
+    private int colorChosen; // 1.Yellow  2.Red  3.Blue  4.Green
 
     /**
      * Initializes the controller.
@@ -139,8 +142,13 @@ public class GameUnoController implements Observer {
      * Prints the human player's cards on the grid pane.
      */
     private void printCardsHumanPlayer() {
+
         this.gridPaneCardsPlayer.getChildren().clear();
         Card[] currentVisibleCardsHumanPlayer = this.gameUno.getCurrentVisibleCardsHumanPlayer(this.posInitCardToShow);
+        if(currentVisibleCardsHumanPlayer.length == 0){
+            AlertBox alertBox = new AlertBox();
+            alertBox.showMessage("Felicitaciones!", "Has Ganado la Partida!", "Eres Muy Bueno");
+        }
 
         for (int i = 0; i < currentVisibleCardsHumanPlayer.length; i++) {
             Card card = currentVisibleCardsHumanPlayer[i];
@@ -205,7 +213,8 @@ public class GameUnoController implements Observer {
                     }
 
                 } else if (card.getPath().contains("wild_change")) {
-                    printCardsHumanByCases(card);
+                    showColorChoiceDialog();
+                    printCardsHumanByCases(deck.getGhostCards().get(colorChosen));
                     hasPlayerPlayed(true);
 
                 } else if (table.getCurrentCardOnTheTable().getPath().contains("4_wild_draw")) {
@@ -330,6 +339,40 @@ public class GameUnoController implements Observer {
             gameUno.eatCard(machinePlayer, 1);
         }
         this.gameUno.notifyObservers();
+    }
+
+    private void showColorChoiceDialog() {
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        alert.setTitle("Escoge un color");
+        alert.setHeaderText("Escoge un color para continuar:");
+
+        ButtonType redButton = new ButtonType("Rojo");
+        ButtonType yellowButton = new ButtonType("Amarillo");
+        ButtonType greenButton = new ButtonType("Verde");
+        ButtonType blueButton = new ButtonType("Azul");
+
+        alert.getButtonTypes().setAll(redButton, yellowButton, greenButton, blueButton);
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == yellowButton) {
+                System.out.println("Yellow chosen");
+                colorChosen = 0;
+            } else if (response == redButton) {
+                System.out.println("Red chosen");
+                colorChosen = 1;
+            } else if (response == blueButton) {
+                System.out.println("Blue chosen");
+                colorChosen = 2;
+            } else if (response == greenButton) {
+                System.out.println("Green chosen");
+                colorChosen = 3;
+            }
+            // Close the alert
+            alert.close();
+        });
+
+        // This line ensures the application exits after the dialog is closed
+        Platform.exit();
     }
 
     @FXML
