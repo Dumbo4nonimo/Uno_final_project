@@ -25,9 +25,12 @@ import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.model.unoenum.EISCUnoEnum;
 import javafx.scene.control.Button;
 
-import javax.swing.plaf.PanelUI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Controller for the UNO game.
+ * Implements the Observer interface to update the UI based on game state changes.
+ */
 public class GameUnoController implements Observer {
 
     @FXML
@@ -41,6 +44,7 @@ public class GameUnoController implements Observer {
 
     @FXML
     private Label logoEiscUno;
+
     @FXML
     private Label sayOne;
 
@@ -102,11 +106,12 @@ public class GameUnoController implements Observer {
         this.table = new Table();
         this.gameUno = new GameUno(this.humanPlayer, this.machinePlayer, this.deck, this.table);
         this.posInitCardToShow = 0;
-        this.posInitCardToShow1 = 1;
-
-
+        this.posInitCardToShow1 = 0;
     }
 
+    /**
+     * Sets the images for the UI components.
+     */
     public void setImages() {
         Image imageUno = new Image(getClass().getResourceAsStream(EISCUnoEnum.UNO.getFilePath()));
         ImageView imageViewUno = new ImageView(imageUno);
@@ -127,9 +132,15 @@ public class GameUnoController implements Observer {
         unoButton.setGraphic(imageViewUnoButton);
     }
 
+    /**
+     * Finds the index of a card in the machine player's hand based on its path.
+     *
+     * @param path The path of the card.
+     * @return The index of the card in the machine player's hand, or -1 if not found.
+     */
     private int findCardMachine(String path) {
         Card card;
-        for (int i=0; i < machinePlayer.getCardsPlayer().size() ; i++) {
+        for (int i = 0; i < machinePlayer.getCardsPlayer().size(); i++) {
             card = machinePlayer.getCardsPlayer().get(i);
             if (card.getPath().equals(path)) {
                 return i;
@@ -141,47 +152,54 @@ public class GameUnoController implements Observer {
     /**
      * Prints the human player's cards on the grid pane.
      */
+
     private void printCardsHumanPlayer() {
 
         this.gridPaneCardsPlayer.getChildren().clear();
         Card[] currentVisibleCardsHumanPlayer = this.gameUno.getCurrentVisibleCardsHumanPlayer(this.posInitCardToShow);
-        if(currentVisibleCardsHumanPlayer.length == 0){
+
+        // Check if the human player has won the game
+        if (currentVisibleCardsHumanPlayer.length == 0) {
             AlertBox alertBox = new AlertBox();
-            alertBox.showMessage("Felicitaciones!", "Has Ganado la Partida!", "Eres Muy Bueno");
+            alertBox.showMessage("Congratulations!", "You've Won the Game!", "You're Awesome");
         }
 
+        // Iterate through each visible card of the human player
         for (int i = 0; i < currentVisibleCardsHumanPlayer.length; i++) {
             Card card = currentVisibleCardsHumanPlayer[i];
             ImageView cardImageView = card.getCard();
 
+            // Handle mouse click event on the card
             cardImageView.setOnMouseClicked((MouseEvent event) -> {
-                // Verify if the card can be played on the table
+                // Clear any displayed messages
                 plusTwoPlusFourMessage.setVisible(false);
                 attackMessage.setVisible(false);
 
                 if (table.isEmpty()) {
+                    // If the table is empty, play the card directly
                     printCardsHumanByCases(card);
                     hasPlayerPlayed(true);
                     controlButton = true;
 
                 } else if (card.getPath().contains("2_wild_draw")) {
+                    // If the card is a +2, check if it matches the current table card color
                     if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
-                        //Two cards are added to the machine´s array of cards
                         int index = findCardMachine(card.getPath());
                         if (index != -1) {
+                            // Handle the situation where the machine player can counterattack
                             printCardsHumanByCases(card);
                             machinePlayer.removeCard(index);
-                            attackMessage.setText("La maquina ha contraatacado");
-                            plusTwoPlusFourMessage.setText("Tu: +4");
+                            attackMessage.setText("The machine has counterattacked");
+                            plusTwoPlusFourMessage.setText("You: +4");
                             plusTwoPlusFourMessage.setVisible(true);
                             attackMessage.setVisible(true);
                             gameUno.eatCard(humanPlayer, 4);
                             hasPlayerPlayed(false);
 
-
                         } else {
+                            // Handle the situation where the card is played normally
                             printCardsHumanByCases(card);
-                            plusTwoPlusFourMessage.setText("Maquina: +2");
+                            plusTwoPlusFourMessage.setText("Machine: +2");
                             plusTwoPlusFourMessage.setVisible(true);
                             gameUno.eatCard(machinePlayer, 2);
                             hasPlayerPlayed(true);
@@ -189,67 +207,85 @@ public class GameUnoController implements Observer {
                     }
 
                 } else if (card.getPath().contains("4_wild_draw")) {
-                    //Four cards are added to the machine´s array of cards
+                    // If the card is a +4, add 4 cards to the machine player's deck
                     printCardsHumanByCases(card);
-                    plusTwoPlusFourMessage.setText("Maquina: +4");
+                    plusTwoPlusFourMessage.setText("Machine: +4");
                     plusTwoPlusFourMessage.setVisible(true);
                     gameUno.eatCard(machinePlayer, 4);
                     hasPlayerPlayed(true);
 
                 } else if (card.getPath().contains("reserve_")) {
+                    // Handle reserve card logic
                     if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
-                        //Give the turn to machine on reverse
                         printCardsHumanByCases(card);
                         hasPlayerPlayed(true);
                     }
 
                 } else if (card.getPath().contains("skip_")) {
+                    // Handle skip card logic
                     if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor())) {
-                        //Skip turn to machine - stop
                         printCardsHumanByCases(card);
-                        attackMessage.setText("Oponente Bloqueado\n       Vuelve a tirar");
+                        attackMessage.setText("Opponent Blocked\n       Turn Skipped");
                         attackMessage.setVisible(true);
                         hasPlayerPlayed(false);
                     }
 
                 } else if (card.getPath().contains("wild_change")) {
+                    // Handle wild card logic for color selection
                     showColorChoiceDialog();
-                    printCardsHumanByCases(deck.getGhostCards().get(colorChosen));
+                    gameUno.playCard(deck.getGhostCards().get(colorChosen));
+                    tableImageView.setImage(card.getImage());
+                    humanPlayer.removeCard(findPosCardsPlayer(humanPlayer, card));
+                    printCardsHumanPlayer();
                     hasPlayerPlayed(true);
 
                 } else if (table.getCurrentCardOnTheTable().getPath().contains("4_wild_draw")) {
+                    // Handle playing a regular card on a +4 card
                     printCardsHumanByCases(card);
                     hasPlayerPlayed(true);
-                } else if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor()) || table.getCurrentCardOnTheTable().getValue().equals(card.getValue())) {
+                } else if (table.getCurrentCardOnTheTable().getColor().equals(card.getColor()) ||
+                        table.getCurrentCardOnTheTable().getValue().equals(card.getValue())) {
+                    // Handle playing a matching color or value card
                     printCardsHumanByCases(card);
                     hasPlayerPlayed(true);
                 }
-
             });
 
-
+            // Add the card image view to the grid pane
             this.gridPaneCardsPlayer.add(cardImageView, i, 0);
         }
     }
 
+    /**
+     * Plays the specified card by the human player, updates the game state, and refreshes the displayed cards.
+     *
+     * @param card The card to be played by the human player.
+     */
     public void printCardsHumanByCases(Card card) {
-        gameUno.playCard(card); //puts the user's card on table's array
-        tableImageView.setImage(card.getImage()); //puts the img on the table GUI
-        humanPlayer.removeCard(findPosCardsPlayer(humanPlayer, card));
-        printCardsHumanPlayer();
+        gameUno.playCard(card); // Puts the user's card on the table's array
+        tableImageView.setImage(card.getImage()); // Updates the table GUI with the card image
+        humanPlayer.removeCard(findPosCardsPlayer(humanPlayer, card)); // Removes the card from the human player's hand
+        printCardsHumanPlayer(); // Refreshes the displayed cards for the human player
     }
 
+    /**
+     * Sets whether the human player has made a move, affecting the gameplay flow.
+     *
+     * @param bool Boolean indicating if the player has made a move.
+     */
     public void hasPlayerPlayed(boolean bool) {
         threadPlayMachine.setHasPlayerPlayed(bool);
     }
 
-
-    //method used only for setting the Uno type cards on machine's deck
+    /**
+     * Displays Uno type cards on the machine player's deck in the GUI.
+     */
     private void printCardsMachinePlayer() {
         Platform.runLater(() -> {
             this.gridPaneCardsMachine.getChildren().clear();
             Card[] currentVisibleCardsMachinePlayer = this.gameUno.getCurrentVisibleCardsMachinePlayer(this.posInitCardToShow1);
 
+            // Iterate through each visible card of the machine player
             for (int i = 0; i < currentVisibleCardsMachinePlayer.length; i++) {
                 Image cardMachine = new Image(getClass().getResourceAsStream(EISCUnoEnum.CARD_UNO.getFilePath()));
                 ImageView cardImageView = new ImageView(cardMachine);
@@ -341,91 +377,127 @@ public class GameUnoController implements Observer {
         this.gameUno.notifyObservers();
     }
 
+    /**
+     * Displays a dialog box for the human player to choose a color.
+     * Sets the chosen color index based on the player's selection.
+     */
     private void showColorChoiceDialog() {
         Alert alert = new Alert(Alert.AlertType.NONE);
-        alert.setTitle("Escoge un color");
-        alert.setHeaderText("Escoge un color para continuar:");
+        alert.setTitle("Choose a color");
+        alert.setHeaderText("Choose a color to continue:");
 
-        ButtonType redButton = new ButtonType("Rojo");
-        ButtonType yellowButton = new ButtonType("Amarillo");
-        ButtonType greenButton = new ButtonType("Verde");
-        ButtonType blueButton = new ButtonType("Azul");
+        ButtonType redButton = new ButtonType("Red");
+        ButtonType yellowButton = new ButtonType("Yellow");
+        ButtonType greenButton = new ButtonType("Green");
+        ButtonType blueButton = new ButtonType("Blue");
 
         alert.getButtonTypes().setAll(redButton, yellowButton, greenButton, blueButton);
 
         alert.showAndWait().ifPresent(response -> {
             if (response == yellowButton) {
                 System.out.println("Yellow chosen");
-                colorChosen = 0;
+                colorChosen = 0; // Yellow color index
             } else if (response == redButton) {
                 System.out.println("Red chosen");
-                colorChosen = 1;
+                colorChosen = 1; // Red color index
             } else if (response == blueButton) {
                 System.out.println("Blue chosen");
-                colorChosen = 2;
+                colorChosen = 2; // Blue color index
             } else if (response == greenButton) {
                 System.out.println("Green chosen");
-                colorChosen = 3;
+                colorChosen = 3; // Green color index
             }
-            // Close the alert
+            // Close the alert dialog
             alert.close();
         });
-
-        // This line ensures the application exits after the dialog is closed
-        Platform.exit();
     }
 
+    /**
+     * Handles the action when the "Skip Turn" button is clicked.
+     *
+     * @param event The action event triggered by clicking the "Skip Turn" button.
+     */
     @FXML
     void skipTurnOnAction(ActionEvent event) {
         if(controlButton){
+            // If control button is true, mark that the player has played and show skip message
             hasPlayerPlayed(true);
-            attackMessage.setText("Saltaste turno");
+            attackMessage.setText("Turn skipped");
             attackMessage.setVisible(true);
-        }else{
+        } else {
+            // If control button is false, show an alert indicating it's too early to skip turn
             AlertBox alertBox = new AlertBox();
-            alertBox.showMessage("Upss!","No te apures","Es muy temprano para saltar turno");
+            alertBox.showMessage("Oops!","Don't hurry","It's too early to skip turn");
         }
-
-
     }
 
-
+    /**
+     * Shows a label for a specific duration and performs actions based on player interaction with the game.
+     * It resets the Uno button state if not pressed within a set time frame.
+     */
     public void showSayOneLabel() {
         Platform.runLater(() -> {
-            sayOne.setVisible(true);
-            unoButtonPressed.set(false);  // Reset the Uno button state
+            sayOne.setVisible(true); // Display the label indicating "Say One"
+            unoButtonPressed.set(false); // Reset the Uno button state
 
+            // Create a timeline to hide the label after 3 seconds if Uno button is not pressed
             Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), evt -> {
                 if (!unoButtonPressed.get()) {
                     System.out.println("The player did not press Uno in 3 seconds");
                 }
-                sayOne.setVisible(false);
-                this.threadSingUNOMachine.setEat(true);
+                sayOne.setVisible(false); // Hide the "Say One" label
+                this.threadSingUNOMachine.setEat(true); // Set the machine's turn to eat
             }));
             timeline.setCycleCount(1);
-            timeline.play();
+            timeline.play(); // Start the timeline
         });
     }
 
+    /**
+     * Makes the machine player say "Uno" and takes appropriate actions.
+     */
     public void singUnoMachine() {
         Platform.runLater(() -> {
-            gameUno.eatCard(humanPlayer, 1);
-            this.threadSingUNOMachine.setEat(true);
+            gameUno.eatCard(humanPlayer, 1); // Make the machine player eat 1 card
+            this.threadSingUNOMachine.setEat(true); // Set the machine's turn to eat
         });
     }
 
+    /**
+     * Updates the UI by refreshing the displayed cards for both human and machine players.
+     */
     @Override
     public void update() {
         Platform.runLater(() -> {
-            printCardsHumanPlayer();
-            printCardsMachinePlayer();
+            printCardsHumanPlayer(); // Refresh human player's cards
+            printCardsMachinePlayer(); // Refresh machine player's cards
         });
     }
 
+    /**
+     * Increments the initial position of cards to show for the machine player and updates the UI.
+     */
     public void incrementPosInitCardToShow1() {
         Platform.runLater(() -> {
             //this.posInitCardToShow1++;
-            printCardsMachinePlayer();
+            printCardsMachinePlayer(); // Refresh machine player's cards
+        });
+    }
+
+    /**
+     * Updates the UI to show the machine player's cards.
+     */
+    public void showMachineCards() {
+        printCardsMachinePlayer(); // Refresh machine player's cards
+    }
+
+    /**
+     * Makes the machine player eat 1 card and updates the UI accordingly.
+     */
+    public void eatMachineCards() {
+        Platform.runLater(() -> {
+            gameUno.eatCard(machinePlayer, 1); // Make the machine player eat 1 card
+            printCardsMachinePlayer(); // Refresh machine player's cards
         });
     }
 }

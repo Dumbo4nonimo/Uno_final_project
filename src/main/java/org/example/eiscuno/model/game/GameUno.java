@@ -32,6 +32,14 @@ public class GameUno implements IGameUno,Observable {
      * @param table         The table where cards are placed during the game.
      *
      */
+    /**
+     * Constructs a GameUno object with specified human player, machine player, deck, and table.
+     *
+     * @param humanPlayer The human player participating in the game.
+     * @param machinePlayer The machine player participating in the game.
+     * @param deck The deck of cards used in the game.
+     * @param table The table where cards are played.
+     */
     public GameUno(Player humanPlayer, Player machinePlayer, Deck deck, Table table) {
         this.humanPlayer = humanPlayer;
         this.machinePlayer = machinePlayer;
@@ -39,6 +47,7 @@ public class GameUno implements IGameUno,Observable {
         this.table = table;
         this.observers = new ArrayList<>();
     }
+
     @Override
     public void addObserver(Observer observer) {
         observers.add(observer);
@@ -60,17 +69,16 @@ public class GameUno implements IGameUno,Observable {
      * Starts the Uno game by distributing cards to players.
      * The human player and the machine player each receive 10 cards from the deck.
      */
-
     @Override
     public void startGame() {
         for (int i = 0; i < 10; i++) {
-            if (i < 8) {
+            if (i < 5) {
                 humanPlayer.addCard(this.deck.takeCard());
             } else {
                 machinePlayer.addCard(this.deck.takeCard());
             }
         }
-        notifyObservers();  // Notificar a los observadores después de iniciar el juego
+        notifyObservers();  // Notify observers after starting the game
     }
 
     @Override
@@ -78,20 +86,20 @@ public class GameUno implements IGameUno,Observable {
         Card card;
         for (int i = 0; i < numberOfCards; i++) {
             card = this.deck.takeCard();
-            if(card != null){
+            if (card != null) {
                 player.addCard(this.deck.takeCard());
-            }else{
+            } else {
                 AlertBox alertBox = new AlertBox();
-                alertBox.showMessage("Alerta", "Ya no hay mas cartas sobre la baraja","Termina el juego con las que tienes");
-
+                alertBox.showMessage("Alert", "No more cards in the deck", "Finish the game with the cards you have");
             }
         }
-        notifyObservers();  // Notificar a los observadores después de que el jugador coma una carta
+        notifyObservers();  // Notify observers after the player draws a card
     }
+
     @Override
     public void playCard(Card card) {
         this.table.addCardOnTheTable(card);
-        notifyObservers();  // Notificar a los observadores después de jugar una carta
+        notifyObservers();  // Notify observers after playing a card
     }
 
     /**
@@ -126,6 +134,7 @@ public class GameUno implements IGameUno,Observable {
 
         return cards;
     }
+
     @Override
     public Card[] getCurrentVisibleCardsMachinePlayer(int posInitCardToShow) {
         int totalCards = this.machinePlayer.getCardsPlayer().size();
@@ -149,6 +158,11 @@ public class GameUno implements IGameUno,Observable {
         return null;
     }
 
+    /**
+     * Gets the human player.
+     *
+     * @return The human player.
+     */
     public Player getHumanPlayer() {
         return humanPlayer;
     }

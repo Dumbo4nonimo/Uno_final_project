@@ -13,6 +13,9 @@ import org.example.eiscuno.controller.GameUnoController;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * ThreadPlayMachine is a thread responsible for managing the actions of the machine player in a game of Uno.
+ */
 public class ThreadPlayMachine extends Thread {
     private static Table table;
     private static Player machinePlayer;
@@ -22,6 +25,16 @@ public class ThreadPlayMachine extends Thread {
     private GameUnoController gameUnoController;
     private GameUno gameUno;
 
+    /**
+     * Constructs a ThreadPlayMachine with specified table, machine player, table image view, game controller, deck, and game instance.
+     *
+     * @param table The table where the game is played.
+     * @param machinePlayer The machine player participating in the game.
+     * @param tableImageView The ImageView representing the current card on the table.
+     * @param gameUnoController The controller managing the game UI and logic.
+     * @param deck The deck of cards used in the game.
+     * @param gameUno The instance of the game.
+     */
     public ThreadPlayMachine(Table table, Player machinePlayer, ImageView tableImageView, GameUnoController gameUnoController, Deck deck, GameUno gameUno) {
         ThreadPlayMachine.table = table;
         ThreadPlayMachine.machinePlayer = machinePlayer;
@@ -32,6 +45,9 @@ public class ThreadPlayMachine extends Thread {
         this.gameUnoController = gameUnoController;
     }
 
+    /**
+     * Runs the thread, continuously checking if the human player has played, and if so, executing the machine's turn.
+     */
     public void run() {
         while (true) {
             if (hasPlayerPlayed) {
@@ -44,11 +60,13 @@ public class ThreadPlayMachine extends Thread {
                 gameUnoController.showMachineCards();
                 hasPlayerPlayed = false;
                 logicCardsByCases();
-
             }
         }
     }
 
+    /**
+     * Executes the logic for the machine player to choose and play a card based on the current state of the game.
+     */
     private void logicCardsByCases() {
         Platform.runLater(() -> {
             if (!table.isEmpty()) {
@@ -105,6 +123,9 @@ public class ThreadPlayMachine extends Thread {
         });
     }
 
+    /**
+     * Validates and plays basic cards for the machine player.
+     */
     private void validateBasicCards() {
         boolean flag = false;
         int index = 0;
@@ -154,14 +175,24 @@ public class ThreadPlayMachine extends Thread {
         }
     }
 
+    /**
+     * Puts a card on the table and updates the table image view.
+     *
+     * @param card The card to be placed on the table.
+     * @param index The index of the card in the player's hand.
+     */
     private void putCardsOnTable(Card card, int index) {
         table.addCardOnTheTable(card);
         tableImageView.setImage(card.getImage());
         machinePlayer.removeCard(index);
         gameUnoController.showMachineCards();
-
     }
 
+    /**
+     * Takes a card from the deck.
+     *
+     * @return The card taken from the deck.
+     */
     private Card takeCardsFromDeck() {
         while (deck.getIsThereCardsOnDeck()) {
             System.out.println(deck.getIsThereCardsOnDeck());
@@ -179,6 +210,12 @@ public class ThreadPlayMachine extends Thread {
         return null;
     }
 
+    /**
+     * Plays a wild card and changes the color.
+     *
+     * @param card The wild card to be played.
+     * @param index The index of the card in the player's hand.
+     */
     private void wild(Card card, int index) {
         putCardsOnTable(card, index);
         Random random = new Random();
@@ -187,43 +224,63 @@ public class ThreadPlayMachine extends Thread {
         int num = random.nextInt(4) + 1;
         switch (num) {
             case 1:
-                alertBox.showMessage("Color", "El oponente ha cambiado el color a:", "Amarillo");
+                alertBox.showMessage("Color", "The opponent has changed the color to:", "Yellow");
                 table.addCardOnTheTable(deck.getGhostCards().get(0));
                 break;
             case 2:
-                alertBox.showMessage("Color", "El oponente ha cambiado el color a:", "Rojo");
+                alertBox.showMessage("Color", "The opponent has changed the color to:", "Red");
                 table.addCardOnTheTable(deck.getGhostCards().get(1));
                 break;
             case 3:
-                alertBox.showMessage("Color", "El oponente ha cambiado el color a:", "Azul");
+                alertBox.showMessage("Color", "The opponent has changed the color to:", "Blue");
                 table.addCardOnTheTable(deck.getGhostCards().get(2));
                 break;
             case 4:
-                alertBox.showMessage("Color", "El oponente ha cambiado el color a:", "Verde");
+                alertBox.showMessage("Color", "The opponent has changed the color to:", "Green");
                 table.addCardOnTheTable(deck.getGhostCards().get(3));
                 break;
         }
     }
 
+    /**
+     * Plays a skip card, preventing the human player from taking a turn.
+     *
+     * @param card The skip card to be played.
+     * @param index The index of the card in the player's hand.
+     */
     private void skip(Card card, int index) {
         putCardsOnTable(card, index);
-        gameUnoController.attackMessage.setText("Te bloquearon y pierdes turno");
+        gameUnoController.attackMessage.setText("You are blocked and lose a turn");
         gameUnoController.attackMessage.setVisible(true);
         setHasPlayerPlayed(true);
     }
 
+    /**
+     * Plays a reverse card, reversing the turn order.
+     *
+     * @param card The reverse card to be played.
+     * @param index The index of the card in the player's hand.
+     */
     private void reverse(Card card, int index) {
         putCardsOnTable(card, index);
-        gameUnoController.attackMessage.setText("Oponente ha aplicado reversa");
+        gameUnoController.attackMessage.setText("Opponent applied reverse");
         gameUnoController.attackMessage.setVisible(true);
         setHasPlayerPlayed(true);
     }
 
+    /**
+     * Obtains the last card added to the machine player's hand.
+     *
+     * @return The last card added to the machine player's hand.
+     */
     private Card obtainLastAdeedCard() {
         int index = machinePlayer.getCardsPlayer().size() - 1;
         return machinePlayer.getCardsPlayer().get(index);
     }
 
+    /**
+     * Prints the machine player's cards to the console.
+     */
     public void throughMachineCards() {
         int counter = 0;
         for (Card card : machinePlayer.getCardsPlayer()) {
@@ -233,16 +290,30 @@ public class ThreadPlayMachine extends Thread {
         System.out.println();
     }
 
+    /**
+     * Checks if a card matches the color or value of the current card on the table.
+     *
+     * @param card The card to be checked.
+     * @return True if the card matches the color or value, false otherwise.
+     */
     public boolean colorOrValue(Card card) {
         return table.getCurrentCardOnTheTable().getColor().equals(card.getColor()) || table.getCurrentCardOnTheTable().getValue().equals(card.getValue());
     }
 
+    /**
+     * Sets the flag indicating if the human player has played.
+     *
+     * @param hasPlayerPlayed The flag to be set.
+     */
     public void setHasPlayerPlayed(boolean hasPlayerPlayed) {
         this.hasPlayerPlayed = hasPlayerPlayed;
     }
 
+    /**
+     * Displays a message indicating that the machine player skipped a turn.
+     */
     public void passMessageLabel() {
-        gameUnoController.attackMessage.setText("La maquina saltó turno");
+        gameUnoController.attackMessage.setText("The machine skipped a turn");
         gameUnoController.attackMessage.setVisible(true);
     }
 }
