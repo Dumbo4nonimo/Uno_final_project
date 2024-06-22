@@ -6,16 +6,14 @@ import org.example.eiscuno.model.alert.AlertBox;
 import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.deck.Deck;
 import org.example.eiscuno.model.game.GameUno;
-import org.example.eiscuno.model.observer.Observer;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.controller.GameUnoController;
-import org.example.eiscuno.model.unoenum.EISCUnoEnum;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class ThreadPlayMachine extends Thread{
+public class ThreadPlayMachine extends Thread {
     private static Table table;
     private static Player machinePlayer;
     private Deck deck;
@@ -32,7 +30,6 @@ public class ThreadPlayMachine extends Thread{
         this.gameUno = gameUno;
         this.hasPlayerPlayed = false;
         this.gameUnoController = gameUnoController;
-
     }
 
     public void run() {
@@ -44,73 +41,67 @@ public class ThreadPlayMachine extends Thread{
                     e.printStackTrace();
                 }
 
-
-                gameUnoController.incrementPosInitCardToShow1(); // Incrementa posInitCardToShow1 en el controlador
+                gameUnoController.showMachineCards();
                 hasPlayerPlayed = false;
                 logicCardsByCases();
+
             }
         }
     }
 
-    private void logicCardsByCases() {//implementa la logica de cada caso
+    private void logicCardsByCases() {
         Platform.runLater(() -> {
-            if(!table.isEmpty()){
+            if (!table.isEmpty()) {
                 if (!table.getCurrentCardOnTheTable().getIsSpecial()) {
                     validateBasicCards();
                     throughMachineCards();
-
                 } else {
                     Card newCard;
                     ArrayList<Card> cardsPlayerTemporal = new ArrayList<>(machinePlayer.getCardsPlayer());
                     for (int i = 0; i < cardsPlayerTemporal.size(); i++) {
                         Card card = cardsPlayerTemporal.get(i);
-                        if (card.getPath().contains("reserve_")){
-                            if(colorOrValue(card)){
+                        if (card.getPath().contains("reserve_")) {
+                            if (colorOrValue(card)) {
                                 reverse(card, i);
                                 break;
                             }
                             newCard = takeCardsFromDeck();
                             putCardsOnTable(newCard, i);
-
                         } else if (card.getPath().contains("2_wild_draw")) {
-                            if(colorOrValue(card)){
+                            if (colorOrValue(card)) {
                                 putCardsOnTable(card, i);
                                 gameUnoController.plusTwoPlusFourMessage.setText("Tu: +2");
                                 gameUnoController.plusTwoPlusFourMessage.setVisible(true);
-                                gameUno.eatCard(gameUno.getHumanPlayer(),2);
+                                gameUno.eatCard(gameUno.getHumanPlayer(), 2);
                             }
                         } else if (card.getPath().contains("4_wild_draw")) {
                             putCardsOnTable(card, i);
                             gameUnoController.plusTwoPlusFourMessage.setText("Tu: +4");
                             gameUnoController.plusTwoPlusFourMessage.setVisible(true);
-                            gameUno.eatCard(gameUno.getHumanPlayer(),4);
-                        } else if (card.getPath().contains("skip_")){
-                            if(colorOrValue(card)){
+                            gameUno.eatCard(gameUno.getHumanPlayer(), 4);
+                        } else if (card.getPath().contains("skip_")) {
+                            if (colorOrValue(card)) {
                                 skip(card, i);
                                 break;
                             }
                             newCard = takeCardsFromDeck();
                             putCardsOnTable(newCard, i);
-
                         } else if (card.getPath().contains("wild_change")) {
                             wild(card, i);
                             break;
                         } else if (colorOrValue(card)) {
                             putCardsOnTable(card, i);
                             break;
-
                         }
                     }
                 }
-
-            }else{
+            } else {
                 int index = (int) (Math.random() * machinePlayer.getCardsPlayer().size());
                 Card card = machinePlayer.getCard(index);
                 table.addCardOnTheTable(card);
                 tableImageView.setImage(card.getImage());
                 throughMachineCards();
             }
-
         });
     }
 
@@ -123,21 +114,19 @@ public class ThreadPlayMachine extends Thread{
                 putCardsOnTable(card, index);
                 flag = true;
                 break;
-            }else if (card.getPath().contains("skip_")){
-                if(colorOrValue(card)){
+            } else if (card.getPath().contains("skip_")) {
+                if (colorOrValue(card)) {
                     skip(card, index);
                     flag = true;
                     break;
                 }
-
             } else if (card.getPath().contains("reserve_")) {
-                if(colorOrValue(card)){
+                if (colorOrValue(card)) {
                     reverse(card, index);
                     flag = true;
                     break;
                 }
-
-            } else if (card.getPath().contains("wild_change")){
+            } else if (card.getPath().contains("wild_change")) {
                 wild(card, index);
                 flag = true;
                 break;
@@ -154,33 +143,33 @@ public class ThreadPlayMachine extends Thread{
                 gameUnoController.plusTwoPlusFourMessage.setVisible(true);
                 gameUno.eatCard(gameUno.getHumanPlayer(), 4);
             }
-                index++;
+            index++;
         }
 
         if (!flag) {
             Card card = takeCardsFromDeck();
             if (card != null) {
                 putCardsOnTable(card, index);
-
             }
         }
-
     }
 
-    private void putCardsOnTable(Card card, int index){
+    private void putCardsOnTable(Card card, int index) {
         table.addCardOnTheTable(card);
         tableImageView.setImage(card.getImage());
         machinePlayer.removeCard(index);
+        gameUnoController.showMachineCards();
+
     }
 
-    private Card takeCardsFromDeck(){
-        while(deck.getIsThereCardsOnDeck()){
+    private Card takeCardsFromDeck() {
+        while (deck.getIsThereCardsOnDeck()) {
             System.out.println(deck.getIsThereCardsOnDeck());
             machinePlayer.addCard(deck.takeCard());
             Card newCard = obtainLastAdeedCard();
 
-            if(!newCard.getIsSpecial()){
-                if (colorOrValue(newCard)){
+            if (!newCard.getIsSpecial()) {
+                if (colorOrValue(newCard)) {
                     machinePlayer.removeCard(machinePlayer.getCardsPlayer().size() - 1);
                     return newCard;
                 }
@@ -189,7 +178,8 @@ public class ThreadPlayMachine extends Thread{
         passMessageLabel();
         return null;
     }
-    private void wild(Card card, int index){
+
+    private void wild(Card card, int index) {
         putCardsOnTable(card, index);
         Random random = new Random();
         AlertBox alertBox = new AlertBox();
@@ -197,25 +187,25 @@ public class ThreadPlayMachine extends Thread{
         int num = random.nextInt(4) + 1;
         switch (num) {
             case 1:
-                alertBox.showMessage("Color", "El oponente ha cambiado el color a: ","Amarillo");
+                alertBox.showMessage("Color", "El oponente ha cambiado el color a:", "Amarillo");
                 table.addCardOnTheTable(deck.getGhostCards().get(0));
                 break;
             case 2:
-                alertBox.showMessage("Color", "El oponente ha cambiado el color a: ","Rojo");
+                alertBox.showMessage("Color", "El oponente ha cambiado el color a:", "Rojo");
                 table.addCardOnTheTable(deck.getGhostCards().get(1));
                 break;
-
             case 3:
-                alertBox.showMessage("Color", "El oponente ha cambiado el color a: ","Azul");
+                alertBox.showMessage("Color", "El oponente ha cambiado el color a:", "Azul");
                 table.addCardOnTheTable(deck.getGhostCards().get(2));
                 break;
             case 4:
-                alertBox.showMessage("Color", "El oponente ha cambiado el color a: ","verde");
+                alertBox.showMessage("Color", "El oponente ha cambiado el color a:", "Verde");
                 table.addCardOnTheTable(deck.getGhostCards().get(3));
                 break;
         }
     }
-    private void skip(Card card, int index){
+
+    private void skip(Card card, int index) {
         putCardsOnTable(card, index);
         gameUnoController.attackMessage.setText("Te bloquearon y pierdes turno");
         gameUnoController.attackMessage.setVisible(true);
@@ -227,34 +217,31 @@ public class ThreadPlayMachine extends Thread{
         gameUnoController.attackMessage.setText("Oponente ha aplicado reversa");
         gameUnoController.attackMessage.setVisible(true);
         setHasPlayerPlayed(true);
-
     }
 
-    private Card obtainLastAdeedCard (){
-        int index = machinePlayer.getCardsPlayer().size() - 1; //Last added index card
-        return machinePlayer.getCardsPlayer().get(index); //returns card by FIFO
+    private Card obtainLastAdeedCard() {
+        int index = machinePlayer.getCardsPlayer().size() - 1;
+        return machinePlayer.getCardsPlayer().get(index);
     }
 
-
-    public void throughMachineCards(){
+    public void throughMachineCards() {
         int counter = 0;
-        for(Card card : machinePlayer.getCardsPlayer()){
-            System.out.println(counter +". "+card.getPath());
+        for (Card card : machinePlayer.getCardsPlayer()) {
+            System.out.println(counter + ". " + card.getPath());
             counter++;
         }
         System.out.println();
     }
 
-    public boolean colorOrValue(Card card){
-        return  table.getCurrentCardOnTheTable().getColor().equals(card.getColor()) || table.getCurrentCardOnTheTable().getValue().equals(card.getValue());
+    public boolean colorOrValue(Card card) {
+        return table.getCurrentCardOnTheTable().getColor().equals(card.getColor()) || table.getCurrentCardOnTheTable().getValue().equals(card.getValue());
     }
-
 
     public void setHasPlayerPlayed(boolean hasPlayerPlayed) {
         this.hasPlayerPlayed = hasPlayerPlayed;
     }
 
-    public void passMessageLabel(){
+    public void passMessageLabel() {
         gameUnoController.attackMessage.setText("La maquina saltó turno");
         gameUnoController.attackMessage.setVisible(true);
     }

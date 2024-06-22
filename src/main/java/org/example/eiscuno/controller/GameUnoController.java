@@ -19,13 +19,13 @@ import org.example.eiscuno.model.deck.Deck;
 import org.example.eiscuno.model.game.GameUno;
 import org.example.eiscuno.model.machine.ThreadPlayMachine;
 import org.example.eiscuno.model.machine.ThreadSingUNOMachine;
+import org.example.eiscuno.model.machine.unoButtonMonitor;
 import org.example.eiscuno.model.observer.Observer;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.model.unoenum.EISCUnoEnum;
 import javafx.scene.control.Button;
 
-import javax.swing.plaf.PanelUI;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameUnoController implements Observer {
@@ -67,7 +67,8 @@ public class GameUnoController implements Observer {
     private ThreadPlayMachine threadPlayMachine;
     private boolean controlButton = false;
 
-    private final AtomicBoolean unoButtonPressed = new AtomicBoolean(false);
+    private boolean unoButtonPressed=false;
+    private final AtomicBoolean unoButtonPressed1 = new AtomicBoolean(false);
     private int posInitCardToShow1;
     private int colorChosen; // 1.Yellow  2.Red  3.Blue  4.Green
 
@@ -90,6 +91,8 @@ public class GameUnoController implements Observer {
 
         threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.tableImageView, this, deck, this.gameUno);
         threadPlayMachine.start();
+        unoButtonMonitor monitor = new unoButtonMonitor(this.machinePlayer,this);
+        monitor.start();
     }
 
     /**
@@ -102,7 +105,7 @@ public class GameUnoController implements Observer {
         this.table = new Table();
         this.gameUno = new GameUno(this.humanPlayer, this.machinePlayer, this.deck, this.table);
         this.posInitCardToShow = 0;
-        this.posInitCardToShow1 = 1;
+        this.posInitCardToShow1 = 0;
 
 
     }
@@ -328,15 +331,11 @@ public class GameUnoController implements Observer {
      */
     @FXML
     void onHandleUno(ActionEvent event) {
+        setUnoButtonPressed();
         int uno = this.humanPlayer.getCardsPlayer().size();
         int unoMachine = this.machinePlayer.getCardsPlayer().size();
         if (uno == 1) {
             this.threadSingUNOMachine.setEat(false);
-            unoButtonPressed.set(true);
-
-
-        } else if (unoMachine == 1) {
-            gameUno.eatCard(machinePlayer, 1);
         }
         this.gameUno.notifyObservers();
     }
@@ -393,10 +392,10 @@ public class GameUnoController implements Observer {
     public void showSayOneLabel() {
         Platform.runLater(() -> {
             sayOne.setVisible(true);
-            unoButtonPressed.set(false);  // Reset the Uno button state
+            unoButtonPressed1.set(false);  // Reset the Uno button state
 
             Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), evt -> {
-                if (!unoButtonPressed.get()) {
+                if (!unoButtonPressed1.get()) {
                     System.out.println("The player did not press Uno in 3 seconds");
                 }
                 sayOne.setVisible(false);
@@ -422,10 +421,26 @@ public class GameUnoController implements Observer {
         });
     }
 
-    public void incrementPosInitCardToShow1() {
+    public void showMachineCards() {
         Platform.runLater(() -> {
-            //this.posInitCardToShow1++;
             printCardsMachinePlayer();
         });
     }
+    public void eatMachineCards() {
+        Platform.runLater(() -> {
+            gameUno.eatCard(machinePlayer,1);
+            printCardsMachinePlayer();
+        });
+    }
+    public void setUnoButtonPressed() {
+      this.unoButtonPressed=true;
+
+    }
+    public void restarButton(){
+        this.unoButtonPressed=false;
+    }
+    public boolean getUnoButtonPressed(){
+        return this.unoButtonPressed;
+    }
+
 }
