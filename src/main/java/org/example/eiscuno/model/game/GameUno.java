@@ -64,7 +64,7 @@ public class GameUno implements IGameUno,Observable {
     @Override
     public void startGame() {
         for (int i = 0; i < 10; i++) {
-            if (i < 5) {
+            if (i < 8) {
                 humanPlayer.addCard(this.deck.takeCard());
             } else {
                 machinePlayer.addCard(this.deck.takeCard());

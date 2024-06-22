@@ -69,8 +69,7 @@ public class GameUnoController implements Observer {
 
     private final AtomicBoolean unoButtonPressed = new AtomicBoolean(false);
     private int posInitCardToShow1;
-    private int colorChosen = 0; // 0.Yellow  1.Red  2.Blue  3.Green
-    private boolean isCardWildChange = false;
+    private int colorChosen; // 1.Yellow  2.Red  3.Blue  4.Green
 
     /**
      * Initializes the controller.
@@ -215,11 +214,7 @@ public class GameUnoController implements Observer {
 
                 } else if (card.getPath().contains("wild_change")) {
                     showColorChoiceDialog();
-                    System.out.println(colorChosen);
-                    gameUno.playCard(deck.getGhostCards().get(colorChosen));
-                    tableImageView.setImage(card.getImage());
-                    humanPlayer.removeCard(findPosCardsPlayer(humanPlayer,card));
-                    printCardsHumanPlayer();
+                    printCardsHumanByCases(deck.getGhostCards().get(colorChosen));
                     hasPlayerPlayed(true);
 
                 } else if (table.getCurrentCardOnTheTable().getPath().contains("4_wild_draw")) {
@@ -339,13 +334,14 @@ public class GameUnoController implements Observer {
             this.threadSingUNOMachine.setEat(false);
             unoButtonPressed.set(true);
 
+
         } else if (unoMachine == 1) {
             gameUno.eatCard(machinePlayer, 1);
         }
         this.gameUno.notifyObservers();
     }
 
-    public void showColorChoiceDialog() {
+    private void showColorChoiceDialog() {
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.setTitle("Escoge un color");
         alert.setHeaderText("Escoge un color para continuar:");
@@ -374,6 +370,9 @@ public class GameUnoController implements Observer {
             // Close the alert
             alert.close();
         });
+
+        // This line ensures the application exits after the dialog is closed
+        Platform.exit();
     }
 
     @FXML
