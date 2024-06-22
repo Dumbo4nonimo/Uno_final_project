@@ -71,7 +71,7 @@ public class GameUnoController implements Observer {
     private final AtomicBoolean unoButtonPressed1 = new AtomicBoolean(false);
     private int posInitCardToShow1;
     private int colorChosen; // 1.Yellow  2.Red  3.Blue  4.Green
-
+    private unoButtonMonitor monitor;
     /**
      * Initializes the controller.
      */
@@ -91,7 +91,7 @@ public class GameUnoController implements Observer {
 
         threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.tableImageView, this, deck, this.gameUno);
         threadPlayMachine.start();
-        unoButtonMonitor monitor = new unoButtonMonitor(this.machinePlayer,this);
+        monitor = new unoButtonMonitor(this.machinePlayer, this);  // Initialize the monitor
         monitor.start();
     }
 
@@ -329,9 +329,11 @@ public class GameUnoController implements Observer {
      *
      * @param event the action event
      */
+
     @FXML
     void onHandleUno(ActionEvent event) {
-        setUnoButtonPressed();
+        unoButtonPressed1.set(true);  // Update the AtomicBoolean state
+        monitor.setUnoButtonPressed();  // Notify the monitor
         int uno = this.humanPlayer.getCardsPlayer().size();
         int unoMachine = this.machinePlayer.getCardsPlayer().size();
         if (uno == 1) {
@@ -339,6 +341,11 @@ public class GameUnoController implements Observer {
         }
         this.gameUno.notifyObservers();
     }
+
+    public void resetUnoButton() {
+        unoButtonPressed1.set(false);  // Reset the AtomicBoolean state
+    }
+
 
     private void showColorChoiceDialog() {
         Alert alert = new Alert(Alert.AlertType.NONE);
